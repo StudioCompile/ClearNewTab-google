@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Browser Sandbox Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+
+        pre {
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: #f5f5f5;
+            white-space: pre-wrap;
+        }
+
+        button {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<h2>Browser Storage + iframe Test</h2>
+
+<button onclick="runTests()">Run Tests</button>
+
+<pre id="out"></pre>
+
+<script>
+function log(msg) {
+    document.getElementById("out").textContent += msg + "\n";
+}
+
+function runTests() {
+
+    const out = document.getElementById("out");
+    out.textContent = "";
+
+    log("=== ENVIRONMENT ===");
+
+    log("iframe: " + (window !== window.top));
+
+    try {
+        log("origin: " + location.origin);
+    } catch (e) {
+        log("origin blocked: " + e.message);
+    }
+
+    log("\n=== COOKIES ===");
+
+    try {
+        document.cookie = "test_cookie=hello; path=/";
+        log("cookie read: " + document.cookie);
+    } catch (e) {
+        log("cookie error: " + e.message);
+    }
+
+    log("\n=== localStorage ===");
+
+    try {
+        localStorage.setItem("test", "hello");
+        log("localStorage: OK");
+    } catch (e) {
+        log("localStorage blocked: " + e.message);
+    }
+
+    log("\n=== sessionStorage ===");
+
+    try {
+        sessionStorage.setItem("test", "hello");
+        log("sessionStorage: OK");
+    } catch (e) {
+        log("sessionStorage blocked: " + e.message);
+    }
+
+    log("\n=== IndexedDB ===");
+
+    try {
+        const req = indexedDB.open("testDB", 1);
+
+        req.onsuccess = () => {
+            log("IndexedDB: OK");
+        };
+
+        req.onerror = () => {
+            log("IndexedDB error: " + req.error);
+        };
+
+    } catch (e) {
+        log("IndexedDB blocked: " + e.message);
+    }
+
+    log("\n=== iframe test ===");
+
+    const frame = document.createElement("iframe");
+
+    frame.style.width = "100%";
+    frame.style.height = "100px";
+
+    frame.srcdoc = `
+        <script>
+            try {
+                document.cookie = "iframe_test=1";
+                parent.postMessage("iframe loaded + cookie attempted", "*");
+            } catch(e) {
+                parent.postMessage("iframe error: " + e.message, "*");
+            }
+        <\/script>
+    `;
+
+    document.body.appendChild(frame);
+
+}
+
+window.addEventListener("message", e => {
+    log("iframe says: " + e.data);
+});
+</script>
+
+</body>
+</html>
