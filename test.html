@@ -1,78 +1,212 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Iframe Test</title>
+    <title>Capability Test</title>
+
+    <link id="icon" rel="icon" href="data:,">
+
     <style>
         body {
             font-family: Arial;
             padding: 20px;
         }
 
-        iframe {
-            width: 100%;
-            height: 300px;
-            border: 2px solid black;
+        .row {
+            margin: 10px 0;
         }
 
         button {
             margin: 5px;
+            padding: 8px;
         }
 
-        pre {
+        input {
+            padding: 8px;
+            width: 300px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 200px;
+            border: 2px solid black;
+            margin-top: 10px;
+        }
+
+        .box {
             background: #f4f4f4;
             padding: 10px;
+            margin-top: 10px;
             white-space: pre-wrap;
         }
     </style>
 </head>
 <body>
 
-<h2>Iframe Test Page</h2>
+<h2>🧪 Full Capability Test Dashboard</h2>
 
-<button onclick="run()">Run Checks</button>
+<div class="row">
+    <input id="text" placeholder="Type something..." />
+</div>
 
-<iframe id="frame" src="https://example.com"></iframe>
+<div class="row">
+    <button onclick="saveCookie()">Save Cookie</button>
+    <button onclick="loadCookie()">Load Cookie</button>
 
-<pre id="out"></pre>
+    <button onclick="saveLocal()">Save localStorage</button>
+    <button onclick="loadLocal()">Load localStorage</button>
+</div>
+
+<div class="row">
+    <button onclick="setFavicon('red')">Favicon Red</button>
+    <button onclick="setFavicon('blue')">Favicon Blue</button>
+    <button onclick="setFavicon('green')">Favicon Green</button>
+
+    <button onclick="changeTitle()">Change Title</button>
+</div>
+
+<div class="row">
+    <button onclick="runCheck()">Run System Check</button>
+</div>
+
+<div class="box" id="out"></div>
+
+<h3>Iframe Test</h3>
+<iframe src="https://example.com"></iframe>
 
 <script>
+
+const KEY = "testKey";
+
 function log(msg){
     document.getElementById("out").textContent += msg + "\n";
 }
 
-function run(){
-
-    const out = document.getElementById("out");
-    out.textContent = "";
-
-    const frame = document.getElementById("frame");
-
-    log("=== PARENT INFO ===");
-    log("url: " + location.href);
-    log("origin: " + location.origin);
-    log("iframe (self): " + (window !== window.top));
-
-    log("\n=== IFRAME INFO ===");
-
-    log("iframe src: " + frame.src);
-
-    try {
-        log("iframe contentWindow exists: " + !!frame.contentWindow);
-    } catch (e) {
-        log("iframe access blocked: " + e.message);
-    }
-
-    log("\nNOTE:");
-    log("- You cannot access iframe cookies/localStorage if cross-origin");
-    log("- example.com is isolated by browser security");
-    log("- iframe is only for display unless same-origin");
-
+function val(){
+    return document.getElementById("text").value;
 }
 
-// message listener (if iframe ever sends anything)
-window.addEventListener("message", (e) => {
-    log("message from iframe: " + JSON.stringify(e.data));
-});
+/* ---------------- COOKIE ---------------- */
+
+function saveCookie(){
+
+    try {
+        document.cookie =
+            KEY + "=" + encodeURIComponent(val()) +
+            "; path=/";
+
+        log("🍪 cookie saved");
+    } catch(e){
+        log("🍪 cookie blocked: " + e.message);
+    }
+}
+
+function loadCookie(){
+
+    const cookies = document.cookie.split("; ");
+    let found = "(none)";
+
+    for(let c of cookies){
+        const [k,v] = c.split("=");
+        if(k === KEY) found = decodeURIComponent(v);
+    }
+
+    document.getElementById("text").value = found;
+
+    log("🍪 cookie loaded: " + found);
+}
+
+/* ---------------- LOCAL STORAGE ---------------- */
+
+function saveLocal(){
+
+    try {
+        localStorage.setItem(KEY, val());
+        log("💾 localStorage saved");
+    } catch(e){
+        log("💾 localStorage blocked: " + e.message);
+    }
+}
+
+function loadLocal(){
+
+    try {
+        const v = localStorage.getItem(KEY);
+        document.getElementById("text").value = v || "(none)";
+        log("💾 localStorage loaded: " + v);
+    } catch(e){
+        log("💾 localStorage blocked: " + e.message);
+    }
+}
+
+/* ---------------- FAVICON ---------------- */
+
+function setFavicon(color){
+
+    const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+            <rect width="64" height="64" fill="${color}"/>
+        </svg>`;
+
+    document.getElementById("icon").href =
+        "data:image/svg+xml," + encodeURIComponent(svg);
+
+    log("🎨 favicon set: " + color);
+}
+
+/* ---------------- TITLE ---------------- */
+
+function changeTitle(){
+
+    document.title = "Changed " + Math.random().toString(16).slice(2);
+
+    log("🏷️ title changed");
+}
+
+/* ---------------- SYSTEM CHECK ---------------- */
+
+function runCheck(){
+
+    document.getElementById("out").textContent = "";
+
+    log("=== SYSTEM CHECK ===");
+
+    log("url: " + location.href);
+    log("origin: " + location.origin);
+    log("iframe: " + (window !== window.top));
+
+    /* cookies */
+    try {
+        document.cookie = "test=1";
+        log("cookie access: OK");
+    } catch(e){
+        log("cookie access: BLOCKED " + e.message);
+    }
+
+    /* localStorage */
+    try {
+        localStorage.setItem("x","1");
+        log("localStorage: OK");
+    } catch(e){
+        log("localStorage: BLOCKED " + e.message);
+    }
+
+    /* sessionStorage */
+    try {
+        sessionStorage.setItem("x","1");
+        log("sessionStorage: OK");
+    } catch(e){
+        log("sessionStorage: BLOCKED " + e.message);
+    }
+
+    /* favicon test hint */
+    log("favicon: click buttons above to test UI control");
+
+    log("\n=== INTERPRETATION ===");
+    log("- If storage fails → sandboxed iframe");
+    log("- If favicon/title work → full DOM control");
+    log("- If iframe loads → cross-origin isolation expected");
+}
+
 </script>
 
 </body>
