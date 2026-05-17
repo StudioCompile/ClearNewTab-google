@@ -4,11 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>New Tab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600&family=Google+Sans+Text:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ── RESET ── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; font-family:arial,sans-serif; overflow:hidden; }
-body { display:flex; flex-direction:column; min-height:100vh; background:#f1f3f4; }
+html, body { width:100%; height:100%; overflow:hidden; }
+body {
+  display:flex; flex-direction:column; min-height:100vh; background:#f1f3f4;
+  font-family:'Google Sans Text','Google Sans',Roboto,arial,sans-serif;
+}
 body.dark { background:#202124; }
 
 /* ── FADE-IN ── */
@@ -22,14 +28,13 @@ body.fadein.fadein-go { transition:opacity 0.25s ease; opacity:1; }
 }
 body.no-bg #bg-layer { display:none; }
 
-/* ── PANEL OPEN: shift main ── */
-#main {
+/* ── PANEL OPEN: shift entire page left ── */
+#main, #topnav, #bottom-bar {
   transition:transform 0.3s cubic-bezier(.4,0,.2,1);
-  position:relative; z-index:1;
 }
-body.panel-open #main { transform:translateX(-185px); }
-#bottom-bar { transition:transform 0.3s cubic-bezier(.4,0,.2,1); }
-body.panel-open #bottom-bar { transform:translateX(-185px); }
+body.panel-open #main       { transform:translateX(-180px); }
+body.panel-open #topnav     { transform:translateX(-180px); }
+body.panel-open #bottom-bar { transform:translateX(-180px); }
 
 /* ── CSS CHECKBOX TRICK ── */
 #apps-toggle { display:none; }
@@ -39,13 +44,12 @@ body.panel-open #bottom-bar { transform:translateX(-185px); }
   position:fixed; top:0; right:0;
   display:flex; align-items:center;
   padding:12px 14px; z-index:20;
-  transition:transform 0.3s cubic-bezier(.4,0,.2,1);
 }
-body.panel-open #topnav { transform:translateX(-185px); }
 
 .tnav-link {
   font-size:13px; color:#fff; text-decoration:none;
   padding:6px 8px; border-radius:4px;
+  font-family:'Google Sans','Google Sans Text',arial,sans-serif;
 }
 body.no-bg:not(.dark) .tnav-link { color:rgba(0,0,0,0.7); }
 .tnav-link:hover { text-decoration:underline; }
@@ -74,12 +78,18 @@ body.no-bg:not(.dark) .tnav-icon-label:hover { background:rgba(0,0,0,0.06); }
   box-shadow:0 2px 6px rgba(0,0,0,.12),0 8px 24px rgba(0,0,0,.14);
   width:300px; z-index:100;
   flex-direction:column;
-  font-family:'Google Sans',Roboto,arial,sans-serif;
+  font-family:'Google Sans','Google Sans Text',Roboto,arial,sans-serif;
   overflow:hidden;
   animation:dropIn 0.18s cubic-bezier(.4,0,.2,1);
   max-height:calc(100vh - 70px); overflow-y:auto;
 }
 #apps-toggle:checked ~ .appdrop { display:flex; }
+
+/* Dark mode for appdrop */
+body.dark .appdrop {
+  background:#2d2e31;
+  box-shadow:0 2px 6px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.5);
+}
 
 @keyframes dropIn {
   from { opacity:0; transform:translateY(-8px) scale(0.97); }
@@ -91,30 +101,51 @@ body.no-bg:not(.dark) .tnav-icon-label:hover { background:rgba(0,0,0,0.06); }
   padding:16px 14px 10px 18px; border-bottom:1px solid #f1f3f4;
   position:sticky; top:0; background:#fff; z-index:2;
 }
-.appdrop-title { font-size:14px; font-weight:500; color:#202124; letter-spacing:0.01em; }
+body.dark .appdrop-header { background:#2d2e31; border-bottom-color:#3c4043; }
+
+.appdrop-title { font-size:14px; font-weight:500; color:#202124; letter-spacing:0.01em; font-family:'Google Sans',Roboto,arial,sans-serif; }
+body.dark .appdrop-title { color:#e8eaed; }
+
 .appdrop-edit-btn {
   width:32px; height:32px; border-radius:50%; border:none; background:#f1f3f4;
   cursor:pointer; display:flex; align-items:center; justify-content:center; color:#5f6368; transition:background 0.12s;
 }
+body.dark .appdrop-edit-btn { background:#3c4043; color:#9aa0a6; }
 .appdrop-edit-btn:hover { background:#e8eaed; }
+body.dark .appdrop-edit-btn:hover { background:#4a4e52; }
 .appdrop-edit-btn.active { background:#e8f0fe; color:#1a73e8; }
+body.dark .appdrop-edit-btn.active { background:#1a3052; color:#8ab4f8; }
 
 .appdrop-section {
   display:grid; grid-template-columns:repeat(3,1fr);
   padding:10px 6px 6px; gap:2px;
 }
 .appdrop-divider { height:1px; background:#f1f3f4; margin:4px 14px 0; }
-.appdrop-section-label { font-size:11px; color:#9aa0a6; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; padding:8px 18px 0; }
+body.dark .appdrop-divider { background:#3c4043; }
+
+.appdrop-section-label {
+  font-size:11px; color:#9aa0a6; font-weight:500; letter-spacing:0.04em;
+  text-transform:uppercase; padding:8px 18px 0;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
+}
 
 .app-item-wrap { position:relative; border-radius:14px; }
 .applink {
   display:flex; flex-direction:column; align-items:center;
   gap:5px; padding:8px 4px 10px; border-radius:14px; text-decoration:none; color:#3c4043;
-  font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:400;
+  font-size:11px; font-family:'Google Sans','Google Sans Text',Roboto,arial,sans-serif; font-weight:400;
   transition:background 0.12s; width:100%; text-align:center;
 }
+body.dark .applink { color:#e8eaed; }
 .applink:hover { background:#f1f3f4; }
-.appico { width:54px; height:54px; border-radius:50%; background:#f8f9fa; border:1px solid #e8eaed; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
+body.dark .applink:hover { background:#3c4043; }
+
+.appico {
+  width:54px; height:54px; border-radius:50%; background:#f8f9fa;
+  border:1px solid #e8eaed; display:flex; align-items:center; justify-content:center;
+  overflow:hidden; flex-shrink:0;
+}
+body.dark .appico { background:#3c4043; border-color:#5f6368; }
 .appico img { width:30px; height:30px; object-fit:contain; border-radius:3px; }
 
 .app-del-corner {
@@ -124,6 +155,7 @@ body.no-bg:not(.dark) .tnav-icon-label:hover { background:rgba(0,0,0,0.06); }
   align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.25);
   transition:background 0.12s, transform 0.1s; padding:0; line-height:1;
 }
+body.dark .app-del-corner { border-color:#2d2e31; }
 .app-del-corner:hover { background:#a50e0e; transform:scale(1.1); }
 .edit-mode .app-del-corner { display:flex; }
 
@@ -133,71 +165,139 @@ body.no-bg:not(.dark) .tnav-icon-label:hover { background:rgba(0,0,0,0.06); }
   font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif; flex-direction:column; width:100%;
   transition:background 0.12s, border-color 0.12s;
 }
+body.dark .add-app-btn { border-color:#5f6368; color:#9aa0a6; }
 .add-app-btn:hover { background:#f8f9fa; border-color:#bdc1c6; color:#5f6368; }
+body.dark .add-app-btn:hover { background:#3c4043; border-color:#9aa0a6; }
 .edit-mode .add-app-btn { display:flex; }
 
-.appdrop-more { display:block; text-align:center; padding:8px 0 12px; font-size:12.5px; color:#1a73e8; text-decoration:none; font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500; }
+.appdrop-more {
+  display:block; text-align:center; padding:8px 0 12px; font-size:12.5px;
+  color:#1a73e8; text-decoration:none;
+  font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500;
+}
+body.dark .appdrop-more { color:#8ab4f8; }
 .appdrop-more:hover { text-decoration:underline; }
 
 /* ── APP EDIT MODAL ── */
-.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500; align-items:center; justify-content:center; }
+.modal-backdrop {
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500;
+  align-items:center; justify-content:center;
+}
+body.dark .modal-backdrop { background:rgba(0,0,0,0.6); }
 .modal-backdrop.open { display:flex; }
-.modal { background:#fff; border-radius:24px; padding:28px 28px 20px; width:360px; max-width:calc(100vw - 32px); box-shadow:0 8px 40px rgba(0,0,0,.25); animation:scaleIn 0.18s cubic-bezier(.4,0,.2,1); }
+
+.modal {
+  background:#fff; border-radius:24px; padding:28px 28px 20px; width:360px;
+  max-width:calc(100vw - 32px); box-shadow:0 8px 40px rgba(0,0,0,.25);
+  animation:scaleIn 0.18s cubic-bezier(.4,0,.2,1);
+  font-family:'Google Sans','Google Sans Text',Roboto,arial,sans-serif;
+}
+body.dark .modal { background:#2d2e31; box-shadow:0 8px 40px rgba(0,0,0,.6); }
+
 @keyframes scaleIn { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
-.modal-title { font-size:18px; font-weight:500; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; margin-bottom:20px; }
+
+.modal-title {
+  font-size:18px; font-weight:500; color:#202124;
+  font-family:'Google Sans',Roboto,arial,sans-serif; margin-bottom:20px;
+}
+body.dark .modal-title { color:#e8eaed; }
+
 .modal-field { margin-bottom:14px; }
-.modal-field label { display:block; font-size:12px; color:#5f6368; font-family:'Google Sans',Roboto,arial,sans-serif; margin-bottom:5px; font-weight:500; letter-spacing:0.03em; }
-.modal-field input[type="text"], .modal-field input[type="url"] { width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #dadce0; font-size:14px; color:#202124; font-family:arial,sans-serif; outline:none; transition:border 0.15s; background:#fff; }
+.modal-field label {
+  display:block; font-size:12px; color:#5f6368;
+  font-family:'Google Sans',Roboto,arial,sans-serif; margin-bottom:5px;
+  font-weight:500; letter-spacing:0.03em;
+}
+body.dark .modal-field label { color:#9aa0a6; }
+
+.modal-field input[type="text"], .modal-field input[type="url"] {
+  width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #dadce0;
+  font-size:14px; color:#202124; font-family:'Google Sans Text',arial,sans-serif;
+  outline:none; transition:border 0.15s; background:#fff;
+}
+body.dark .modal-field input[type="text"],
+body.dark .modal-field input[type="url"] {
+  background:#3c4043; border-color:#5f6368; color:#e8eaed;
+}
 .modal-field input:focus { border-color:#1a73e8; }
+body.dark .modal-field input:focus { border-color:#8ab4f8; }
+
 .modal-toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
 .modal-toggle-label { font-size:13px; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; }
+body.dark .modal-toggle-label { color:#e8eaed; }
+
 .toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
 .toggle-switch input { display:none; }
 .toggle-track { position:absolute; inset:0; border-radius:12px; background:#dadce0; cursor:pointer; transition:background 0.2s; }
 .toggle-switch input:checked + .toggle-track { background:#1a73e8; }
 .toggle-thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; pointer-events:none; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform 0.2s; }
 .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(20px); }
-.modal-preview { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; background:#f8f9fa; margin-bottom:18px; }
+
+.modal-preview {
+  display:flex; align-items:center; gap:12px; padding:10px 14px;
+  border-radius:12px; background:#f8f9fa; margin-bottom:18px;
+}
+body.dark .modal-preview { background:#3c4043; }
 .modal-preview .appico { width:36px; height:36px; flex-shrink:0; }
 .modal-preview .appico img { width:20px; height:20px; }
 .modal-preview-name { font-size:13px; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; }
+body.dark .modal-preview-name { color:#e8eaed; }
+
 .modal-btns { display:flex; justify-content:flex-end; gap:10px; }
-.modal-btn { padding:9px 20px; border-radius:10px; border:none; font-size:14px; font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500; cursor:pointer; transition:background 0.12s; }
+.modal-btn {
+  padding:9px 20px; border-radius:10px; border:none; font-size:14px;
+  font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500; cursor:pointer; transition:background 0.12s;
+}
 .modal-btn.cancel { background:#f1f3f4; color:#444; }
+body.dark .modal-btn.cancel { background:#3c4043; color:#e8eaed; }
 .modal-btn.cancel:hover { background:#e8eaed; }
+body.dark .modal-btn.cancel:hover { background:#4a4e52; }
 .modal-btn.save { background:#1a73e8; color:#fff; }
 .modal-btn.save:hover { background:#1765cc; }
+body.dark .modal-btn.save { background:#8ab4f8; color:#202124; }
+body.dark .modal-btn.save:hover { background:#93bbf9; }
 .modal-btn.delete { background:#fce8e6; color:#c5221f; margin-right:auto; }
+body.dark .modal-btn.delete { background:#4a1818; color:#f28b82; }
 .modal-btn.delete:hover { background:#f5c6c2; }
+body.dark .modal-btn.delete:hover { background:#5c2020; }
 
 /* ── MAIN ── */
-#main { flex:1; display:flex; flex-direction:column; align-items:center; padding-top:14vh; }
+#main { flex:1; display:flex; flex-direction:column; align-items:center; padding-top:14vh; position:relative; z-index:1; }
 .glogo { width:272px; margin-bottom:28px; cursor:default; }
 body.no-bg:not(.dark) .glogo path { fill:#3c4043; }
 body.dark .glogo path { fill:#e8eaed; }
 
 /* ── SEARCH BAR ── */
 .sbar-wrap { width:582px; max-width:calc(100vw - 48px); }
-.sbar { width:100%; height:44px; background:#fff; border:none; border-radius:24px; display:flex; align-items:center; padding:0 10px 0 12px; gap:8px; box-shadow:0 1px 6px rgba(0,0,0,.22),0 2px 10px rgba(0,0,0,.12); transition:box-shadow 0.15s; }
+.sbar {
+  width:100%; height:44px; background:#fff; border:none; border-radius:24px;
+  display:flex; align-items:center; padding:0 10px 0 12px; gap:8px;
+  box-shadow:0 1px 6px rgba(0,0,0,.22),0 2px 10px rgba(0,0,0,.12); transition:box-shadow 0.15s;
+}
 .sbar:hover, .sbar:focus-within { box-shadow:0 1px 12px rgba(0,0,0,.32),0 2px 14px rgba(0,0,0,.16); }
 body.dark .sbar { background:#303134; box-shadow:none; }
 body.dark .sbar:hover, body.dark .sbar:focus-within { box-shadow:0 1px 12px rgba(0,0,0,.5); }
 
-.s-submit { width:32px; height:32px; border-radius:50%; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#9aa0a6; flex-shrink:0; padding:0; }
+.s-submit {
+  width:32px; height:32px; border-radius:50%; border:none; background:transparent;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+  color:#9aa0a6; flex-shrink:0; padding:0;
+}
 .s-submit:hover { background:rgba(0,0,0,.06); color:#5f6368; }
 body.dark .s-submit:hover { background:rgba(255,255,255,.08); }
-#q { flex:1; border:none; outline:none; font-size:16px; color:#202124; background:transparent; caret-color:#202124; min-width:0; }
+#q {
+  flex:1; border:none; outline:none; font-size:16px; color:#202124;
+  background:transparent; caret-color:#202124; min-width:0;
+  font-family:'Google Sans Text','Google Sans',Roboto,arial,sans-serif;
+}
 #q::placeholder { color:#9aa0a6; font-size:14px; font-weight:300; }
 body.dark #q { color:#e8eaed; caret-color:#e8eaed; }
 .s-actions { display:flex; align-items:center; flex-shrink:0; }
 
-/* AI Mode button — fixed: equal padding, slightly more right margin */
 .ai-btn {
   display:inline-flex; align-items:center; gap:6px;
-  padding:7px 8px 7px 7px;
-  border-radius:20px; border:none;
-  background:#e9eaed;
-  font-size:13px; color:#202124;
+  padding:7px 8px 7px 7px; border-radius:20px; border:none;
+  background:#e9eaed; font-size:13px; color:#202124;
   cursor:pointer; white-space:nowrap;
   font-family:'Google Sans',Roboto,arial,sans-serif;
   font-weight:500; text-decoration:none;
@@ -208,14 +308,17 @@ body.dark .ai-btn { background:#3c4043; color:#e8eaed; }
 body.dark .ai-btn:hover { background:#4a4e52; }
 
 /* ── BOTTOM BAR ── */
-#bottom-bar { position:fixed; bottom:0; left:0; right:0; display:flex; align-items:flex-end; justify-content:space-between; padding:10px 14px 14px; z-index:10; pointer-events:none; }
+#bottom-bar {
+  position:fixed; bottom:0; left:0; right:0;
+  display:flex; align-items:flex-end; justify-content:space-between;
+  padding:10px 14px 14px; z-index:10; pointer-events:none;
+}
 #photocredit { display:flex; align-items:center; gap:5px; pointer-events:all; }
 #photocredit svg { color:rgba(255,255,255,0.75); }
-#photocredit a { font-size:11px; color:rgba(255,255,255,0.8); text-decoration:none; }
+#photocredit a { font-size:11px; color:rgba(255,255,255,0.8); text-decoration:none; font-family:'Google Sans',Roboto,arial,sans-serif; }
 #photocredit a:hover { color:#fff; text-decoration:underline; }
 body.no-bg #photocredit { visibility:hidden; }
 
-/* Pencil/customize button — clean, no blur, Chrome-style */
 #customize-btn {
   pointer-events:all; width:32px; height:32px; border-radius:50%;
   background:rgba(0,0,0,0.28); border:none; cursor:pointer;
@@ -235,10 +338,10 @@ body.panel-open #panel-backdrop { display:block; }
 
 #customize-panel {
   position:fixed; top:0; right:-380px; width:360px; height:100vh;
-  background:#292a2d; color:#e3e3e3; z-index:300; display:flex; flex-direction:column;
+  background:#3c3c3c; color:#e3e3e3; z-index:300; display:flex; flex-direction:column;
   box-shadow:-4px 0 24px rgba(0,0,0,.35);
   transition:right 0.3s cubic-bezier(.4,0,.2,1);
-  font-family:'Google Sans',Roboto,arial,sans-serif;
+  font-family:'Google Sans','Google Sans Text',Roboto,arial,sans-serif;
   overflow:hidden;
 }
 body.panel-open #customize-panel { right:0; }
@@ -248,7 +351,7 @@ body.panel-open #customize-panel { right:0; }
   display:flex; align-items:center; justify-content:space-between;
   padding:18px 18px 14px; flex-shrink:0; border-bottom:1px solid rgba(255,255,255,0.08);
 }
-.panel-title { font-size:16px; font-weight:400; color:#e3e3e3; letter-spacing:0.01em; }
+.panel-title { font-size:16px; font-weight:400; color:#e3e3e3; letter-spacing:0.01em; font-family:'Google Sans',Roboto,arial,sans-serif; }
 .panel-close {
   width:32px; height:32px; border-radius:50%; border:none; background:transparent;
   cursor:pointer; color:#9aa0a6; display:flex; align-items:center; justify-content:center;
@@ -257,7 +360,10 @@ body.panel-open #customize-panel { right:0; }
 .panel-close:hover { background:rgba(255,255,255,0.1); color:#e3e3e3; }
 
 /* Panel scroll area */
-.panel-body { flex:1; overflow-y:auto; padding:0 0 20px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent; }
+.panel-body {
+  flex:1; overflow-y:auto; padding:0 0 20px;
+  scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent;
+}
 .panel-body::-webkit-scrollbar { width:6px; }
 .panel-body::-webkit-scrollbar-track { background:transparent; }
 .panel-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:3px; }
@@ -267,32 +373,41 @@ body.panel-open #customize-panel { right:0; }
 .panel-section + .panel-section { padding-top:6px; }
 .panel-sep { height:1px; background:rgba(255,255,255,0.08); margin:14px 0 0; }
 
-.panel-section-label { font-size:11px; font-weight:500; color:#9aa0a6; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px; }
+.panel-section-label {
+  font-size:11px; font-weight:500; color:#b0b0b0; letter-spacing:0.06em;
+  text-transform:uppercase; margin-bottom:12px;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
+}
 
 /* Current bg preview */
 .panel-bg-preview {
-  width:100%; height:160px; border-radius:14px; overflow:hidden; background:#3c4043;
+  width:100%; height:160px; border-radius:14px; overflow:hidden; background:#4a4a4a;
   margin-bottom:8px; position:relative; cursor:pointer; border:2px solid transparent;
   transition:border-color 0.15s;
 }
 .panel-bg-preview:hover { border-color:rgba(255,255,255,0.2); }
 .panel-bg-preview img { width:100%; height:100%; object-fit:cover; display:block; }
-.panel-bg-preview-none { display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:8px; color:#9aa0a6; font-size:13px; }
-.panel-credit { font-size:11px; color:#9aa0a6; margin-bottom:6px; text-align:center; }
+.panel-bg-preview-none {
+  display:flex; align-items:center; justify-content:center; height:100%;
+  flex-direction:column; gap:8px; color:#9aa0a6; font-size:13px;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
+}
+.panel-credit { font-size:11px; color:#b0b0b0; margin-bottom:6px; text-align:center; font-family:'Google Sans',Roboto,arial,sans-serif; }
 
 /* Bg grid category tabs */
 .panel-cat-tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
 .panel-cat-tab {
   padding:5px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15);
-  background:transparent; color:#9aa0a6; font-size:12px; font-family:'Google Sans',Roboto,arial,sans-serif;
+  background:transparent; color:#b0b0b0; font-size:12px;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
   cursor:pointer; transition:all 0.15s; white-space:nowrap;
 }
-.panel-cat-tab:hover { background:rgba(255,255,255,0.08); color:#e3e3e3; }
+.panel-cat-tab:hover { background:rgba(255,255,255,0.1); color:#e3e3e3; }
 .panel-cat-tab.active { background:rgba(138,180,248,0.2); border-color:#8ab4f8; color:#8ab4f8; }
 
 /* Bg grid */
 .panel-bg-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
-.panel-bg-grid-loading { color:#9aa0a6; font-size:12px; padding:12px 0; text-align:center; }
+.panel-bg-grid-loading { color:#9aa0a6; font-size:12px; padding:12px 0; text-align:center; font-family:'Google Sans',Roboto,arial,sans-serif; }
 
 .bg-grid-item {
   position:relative; border-radius:8px; overflow:hidden; cursor:pointer;
@@ -300,9 +415,7 @@ body.panel-open #customize-panel { right:0; }
 }
 .bg-grid-item:hover { transform:scale(1.03); border-color:rgba(255,255,255,0.3); }
 .bg-grid-item.selected { border-color:#8ab4f8; }
-.bg-grid-item.selected::after {
-  content:''; position:absolute; inset:0; background:rgba(138,180,248,0.15);
-}
+.bg-grid-item.selected::after { content:''; position:absolute; inset:0; background:rgba(138,180,248,0.15); }
 .bg-grid-item .check {
   display:none; position:absolute; top:3px; right:3px; width:16px; height:16px; border-radius:50%;
   background:#8ab4f8; z-index:2; align-items:center; justify-content:center;
@@ -313,44 +426,42 @@ body.panel-open #customize-panel { right:0; }
 /* "None" grid item */
 .bg-grid-none {
   display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
-  background:repeating-conic-gradient(#3a3b3e 0% 25%, #2e2f33 0% 50%) 0 0 / 12px 12px;
+  background:repeating-conic-gradient(#484848 0% 25%, #404040 0% 50%) 0 0 / 12px 12px;
   cursor:pointer; border-radius:8px; aspect-ratio:16/10;
   border:2.5px solid transparent; transition:border-color 0.15s;
   font-size:10px; color:#9aa0a6; font-family:'Google Sans',Roboto,arial,sans-serif;
 }
 .bg-grid-none:hover { border-color:rgba(255,255,255,0.3); }
 .bg-grid-none.selected { border-color:#8ab4f8; }
-.bg-grid-none.selected::after { content:''; display:none; }
 
 /* Upload item */
 .bg-grid-upload {
   display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
-  background:#3c4043; cursor:pointer; border-radius:8px; aspect-ratio:16/10;
+  background:#4a4a4a; cursor:pointer; border-radius:8px; aspect-ratio:16/10;
   border:1.5px dashed rgba(255,255,255,0.2); transition:border-color 0.15s, background 0.15s;
   font-size:10px; color:#9aa0a6; font-family:'Google Sans',Roboto,arial,sans-serif;
 }
-.bg-grid-upload:hover { background:#48494c; border-color:rgba(255,255,255,0.35); color:#c8c8c8; }
+.bg-grid-upload:hover { background:#555; border-color:rgba(255,255,255,0.35); color:#c8c8c8; }
 .bg-grid-upload.selected { border-color:#8ab4f8; }
 
 /* Panel toggle rows */
 .panel-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; }
 .panel-toggle-row + .panel-toggle-row { border-top:1px solid rgba(255,255,255,0.06); }
-.panel-toggle-info {}
-.panel-toggle-name { font-size:13px; color:#e3e3e3; }
-.panel-toggle-sub { font-size:11px; color:#9aa0a6; margin-top:2px; }
+.panel-toggle-name { font-size:13px; color:#e3e3e3; font-family:'Google Sans',Roboto,arial,sans-serif; }
+.panel-toggle-sub { font-size:11px; color:#b0b0b0; margin-top:2px; font-family:'Google Sans',Roboto,arial,sans-serif; }
 
-/* Dark toggle track uses blue */
-.dark-track {}
+/* Dark toggle uses blue */
 .toggle-switch input:checked + .toggle-track { background:#8ab4f8; }
 
 /* Panel reset btn */
 .panel-reset-btn {
   width:calc(100% - 36px); margin:14px 18px 0; padding:10px; border-radius:10px; border:none;
-  background:rgba(255,255,255,0.06); color:#9aa0a6; cursor:pointer; font-size:13px;
-  font-family:'Google Sans',Roboto,arial,sans-serif; display:flex; align-items:center; justify-content:space-between;
+  background:rgba(255,255,255,0.06); color:#b0b0b0; cursor:pointer; font-size:13px;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
+  display:flex; align-items:center; justify-content:space-between;
   transition:background 0.12s;
 }
-.panel-reset-btn:hover { background:rgba(255,255,255,0.1); color:#e3e3e3; }
+.panel-reset-btn:hover { background:rgba(255,255,255,0.12); color:#e3e3e3; }
 
 #bg-file-input { display:none; }
 </style>
@@ -438,7 +549,6 @@ body.panel-open #customize-panel { right:0; }
     <div class="panel-section">
       <div class="panel-section-label">Appearance</div>
 
-      <!-- Current bg preview -->
       <div class="panel-bg-preview" id="panel-preview">
         <div class="panel-bg-preview-none" id="panel-preview-none">
           <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
@@ -448,13 +558,10 @@ body.panel-open #customize-panel { right:0; }
       </div>
       <div class="panel-credit" id="panel-credit"></div>
 
-      <!-- Category filter tabs -->
       <div class="panel-cat-tabs" id="panel-cat-tabs">
         <button class="panel-cat-tab active" data-cat="all">All</button>
-        <!-- more tabs injected by JS after fetch -->
       </div>
 
-      <!-- Bg grid -->
       <div class="panel-bg-grid" id="panel-bg-grid">
         <div class="panel-bg-grid-loading" style="grid-column:span 3">Loading backgrounds…</div>
       </div>
@@ -471,7 +578,7 @@ body.panel-open #customize-panel { right:0; }
           <div class="panel-toggle-name">Refresh daily</div>
           <div class="panel-toggle-sub">Cycle to a new photo each day</div>
         </div>
-        <label class="toggle-switch"><input type="checkbox" id="daily-toggle"><div class="toggle-track dark-track"></div><div class="toggle-thumb"></div></label>
+        <label class="toggle-switch"><input type="checkbox" id="daily-toggle"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
       </div>
 
       <div class="panel-toggle-row">
@@ -479,7 +586,7 @@ body.panel-open #customize-panel { right:0; }
           <div class="panel-toggle-name">Dark mode</div>
           <div class="panel-toggle-sub">Dark search bar and UI</div>
         </div>
-        <label class="toggle-switch"><input type="checkbox" id="dark-toggle"><div class="toggle-track dark-track"></div><div class="toggle-thumb"></div></label>
+        <label class="toggle-switch"><input type="checkbox" id="dark-toggle"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
       </div>
 
       <div class="panel-toggle-row">
@@ -487,7 +594,7 @@ body.panel-open #customize-panel { right:0; }
           <div class="panel-toggle-name">Smooth page load</div>
           <div class="panel-toggle-sub">Fade in to hide loading flash</div>
         </div>
-        <label class="toggle-switch"><input type="checkbox" id="fadein-toggle"><div class="toggle-track dark-track"></div><div class="toggle-thumb"></div></label>
+        <label class="toggle-switch"><input type="checkbox" id="fadein-toggle"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
       </div>
     </div>
 
@@ -550,13 +657,22 @@ body.panel-open #customize-panel { right:0; }
 
 <script>
 // ════════════════════════════════════════════════════
-// BACKGROUNDS — fetched and parsed at runtime
+// BACKGROUNDS
 // ════════════════════════════════════════════════════
 const BG_MD_URL = 'https://gist.githubusercontent.com/nondebug/9e68ecdc517e7d78174f485131501806/raw/4e3448746d9c971b09a6414094ffa8eb50e9da04/chrome-ntp-backgrounds.md';
+const HIRES_SUFFIX = '=w3840-h2160-p-k-no-nd-mv';
+const THUMB_SUFFIX = '=w400-h250-p-k-no-nd-mv';
 
-// categories: { name: string, items: [{url, author}] }
 let bgCategories = [];
-let allBgItems = []; // flat list with .category
+let allBgItems = [];
+
+// Append or replace quality suffix on a Google Photos URL
+function withSuffix(url, suffix) {
+  if (!url) return url;
+  // Remove any existing = params at the end (e.g. =s0, =w1920-h1080-...)
+  const base = url.replace(/=[^/?#]*$/, '');
+  return base + suffix;
+}
 
 async function fetchBackgrounds() {
   try {
@@ -567,24 +683,17 @@ async function fetchBackgrounds() {
     bgCategories.forEach(cat => cat.items.forEach(item => allBgItems.push({ ...item, category: cat.name })));
   } catch(e) {
     console.warn('Could not fetch backgrounds:', e);
-    bgCategories = [];
-    allBgItems = [];
+    bgCategories = []; allBgItems = [];
   }
 }
 
 function parseMarkdown(md) {
   const cats = [];
   let currentCat = null;
-  const lines = md.split('\n');
-  // [Photo by Author](URL) or [Photo by Author](URL) ([context](...))
   const photoRe = /\[Photo by ([^\]]+)\]\((https?:\/\/[^)]+)\)/;
-  for (const line of lines) {
+  for (const line of md.split('\n')) {
     const h = line.match(/^#+ (.+)$/);
-    if (h) {
-      currentCat = { name: h[1].trim(), items: [] };
-      cats.push(currentCat);
-      continue;
-    }
+    if (h) { currentCat = { name: h[1].trim(), items: [] }; cats.push(currentCat); continue; }
     if (currentCat) {
       const m = line.match(photoRe);
       if (m) currentCat.items.push({ author: m[1].trim(), url: m[2].trim() });
@@ -594,15 +703,13 @@ function parseMarkdown(md) {
 }
 
 // ════════════════════════════════════════════════════
-// BG CONFIG — localStorage
+// CONFIG
 // ════════════════════════════════════════════════════
 function loadCfg() {
   try { const r = localStorage.getItem('nt_cfg2'); if (r) return JSON.parse(r); } catch(e) {}
   return { type:'none', catName:'', itemIdx:0, dailyRefresh:false, lastDate:'', dark:false, fadeIn:false };
 }
-function saveCfg() {
-  try { localStorage.setItem('nt_cfg2', JSON.stringify(cfg)); } catch(e) {}
-}
+function saveCfg() { try { localStorage.setItem('nt_cfg2', JSON.stringify(cfg)); } catch(e) {} }
 function loadUpload() { try { return localStorage.getItem('nt_upload')||''; } catch(e) { return ''; } }
 function saveUpload(u) { try { localStorage.setItem('nt_upload', u); } catch(e) {} }
 
@@ -612,10 +719,9 @@ cfg.uploadUrl = loadUpload();
 function todayStr() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
 
 function applyDailyRefresh() {
-  if ((cfg.type==='preset') && cfg.dailyRefresh) {
+  if (cfg.type==='preset' && cfg.dailyRefresh) {
     const today = todayStr();
     if (cfg.lastDate !== today) {
-      // advance within same category
       const cat = bgCategories.find(c => c.name === cfg.catName);
       if (cat && cat.items.length > 0) {
         cfg.itemIdx = (cfg.itemIdx + 1) % cat.items.length;
@@ -644,7 +750,8 @@ function applyBackground() {
     const item = getCurrentItem();
     if (item) {
       document.body.classList.remove('no-bg');
-      layer.style.backgroundImage = `url('${item.url}')`;
+      // Use full-resolution suffix for the actual background
+      layer.style.backgroundImage = `url('${withSuffix(item.url, HIRES_SUFFIX)}')`;
       credit.textContent = `Photo by ${item.author}`;
       credit.href = item.url;
     }
@@ -654,149 +761,116 @@ function applyBackground() {
     credit.textContent = 'Custom background';
     credit.href = '#';
   }
-  // Dark mode
   document.body.classList.toggle('dark', !!cfg.dark);
 }
 
 // ════════════════════════════════════════════════════
 // CUSTOMIZE PANEL
 // ════════════════════════════════════════════════════
-let activeCat = 'all'; // 'all' or category name
+let activeCat = 'all';
 let panelOpen = false;
 
-function openPanel() {
-  panelOpen = true;
-  document.body.classList.add('panel-open');
-  syncPanelUI();
-}
-function closePanel() {
-  panelOpen = false;
-  document.body.classList.remove('panel-open');
-}
+function openPanel() { panelOpen = true; document.body.classList.add('panel-open'); syncPanelUI(); }
+function closePanel() { panelOpen = false; document.body.classList.remove('panel-open'); }
 
 document.getElementById('customize-btn').addEventListener('click', openPanel);
 document.getElementById('panel-close-btn').addEventListener('click', closePanel);
 document.getElementById('panel-backdrop').addEventListener('click', closePanel);
 
 function syncPanelUI() {
-  // Preview
   const previewNone = document.getElementById('panel-preview-none');
-  const previewImg = document.getElementById('panel-preview-img');
+  const previewImg  = document.getElementById('panel-preview-img');
   const panelCredit = document.getElementById('panel-credit');
 
   if (cfg.type === 'none') {
-    previewNone.style.display = 'flex';
-    previewImg.style.display = 'none';
-    panelCredit.textContent = '';
+    previewNone.style.display = 'flex'; previewImg.style.display = 'none'; panelCredit.textContent = '';
   } else if (cfg.type === 'preset') {
     const item = getCurrentItem();
     if (item) {
-      previewNone.style.display = 'none';
-      previewImg.style.display = 'block';
-      previewImg.src = item.url;
+      previewNone.style.display = 'none'; previewImg.style.display = 'block';
+      previewImg.src = withSuffix(item.url, THUMB_SUFFIX);
       panelCredit.textContent = `Photo by ${item.author}`;
     }
   } else if (cfg.type === 'upload') {
-    previewNone.style.display = 'none';
-    previewImg.style.display = 'block';
-    previewImg.src = cfg.uploadUrl;
-    panelCredit.textContent = 'Custom image';
+    previewNone.style.display = 'none'; previewImg.style.display = 'block';
+    previewImg.src = cfg.uploadUrl; panelCredit.textContent = 'Custom image';
   }
 
-  // Daily refresh row - only for preset
   document.getElementById('daily-row').style.display = cfg.type === 'preset' ? 'flex' : 'none';
-  document.getElementById('daily-toggle').checked = cfg.dailyRefresh;
-  document.getElementById('dark-toggle').checked = !!cfg.dark;
-  document.getElementById('fadein-toggle').checked = !!cfg.fadeIn;
+  document.getElementById('daily-toggle').checked   = cfg.dailyRefresh;
+  document.getElementById('dark-toggle').checked    = !!cfg.dark;
+  document.getElementById('fadein-toggle').checked  = !!cfg.fadeIn;
 
   renderBgGrid();
 }
 
 function buildCatTabs() {
   const tabs = document.getElementById('panel-cat-tabs');
-  // Keep 'All' tab, remove old dynamic ones
-  tabs.innerHTML = '<button class="panel-cat-tab" data-cat="all">All</button>';
+  tabs.innerHTML = '<button class="panel-cat-tab active" data-cat="all">All</button>';
   bgCategories.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'panel-cat-tab';
-    btn.dataset.cat = cat.name;
-    btn.textContent = cat.name;
+    btn.className = 'panel-cat-tab'; btn.dataset.cat = cat.name; btn.textContent = cat.name;
     tabs.appendChild(btn);
   });
-  // Upload tab
   const upBtn = document.createElement('button');
-  upBtn.className = 'panel-cat-tab';
-  upBtn.dataset.cat = '__upload';
-  upBtn.textContent = 'Upload';
+  upBtn.className = 'panel-cat-tab'; upBtn.dataset.cat = '__upload'; upBtn.textContent = 'Upload';
   tabs.appendChild(upBtn);
 
   tabs.querySelectorAll('.panel-cat-tab').forEach(btn => {
     btn.addEventListener('click', () => {
       activeCat = btn.dataset.cat;
-      if (activeCat === '__upload') {
-        document.getElementById('bg-file-input').click();
-        return;
-      }
-      syncCatTabs();
-      renderBgGrid();
+      if (activeCat === '__upload') { document.getElementById('bg-file-input').click(); return; }
+      syncCatTabs(); renderBgGrid();
     });
   });
   syncCatTabs();
 }
 
 function syncCatTabs() {
-  document.querySelectorAll('.panel-cat-tab').forEach(b => {
-    b.classList.toggle('active', b.dataset.cat === activeCat);
-  });
+  document.querySelectorAll('.panel-cat-tab').forEach(b => b.classList.toggle('active', b.dataset.cat === activeCat));
 }
 
 function renderBgGrid() {
   const grid = document.getElementById('panel-bg-grid');
   grid.innerHTML = '';
 
-  // None option
+  // None
   const noneEl = document.createElement('div');
   noneEl.className = 'bg-grid-none' + (cfg.type === 'none' ? ' selected' : '');
   noneEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg><span>None</span>`;
   noneEl.addEventListener('click', () => { cfg.type='none'; saveCfg(); applyBackground(); syncPanelUI(); });
-  if (activeCat === 'all' || activeCat === 'all') grid.appendChild(noneEl);
+  if (activeCat === 'all') grid.appendChild(noneEl);
 
-  // Upload option
+  // Upload
   const uploadEl = document.createElement('div');
   uploadEl.className = 'bg-grid-upload' + (cfg.type === 'upload' ? ' selected' : '');
   uploadEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.7"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Upload</span>`;
   uploadEl.addEventListener('click', () => document.getElementById('bg-file-input').click());
   if (activeCat === 'all') grid.appendChild(uploadEl);
 
-  // Items
   const catsToShow = activeCat === 'all' ? bgCategories : bgCategories.filter(c => c.name === activeCat);
 
   if (bgCategories.length === 0) {
     const msg = document.createElement('div');
-    msg.className = 'panel-bg-grid-loading';
-    msg.style.gridColumn = 'span 3';
+    msg.className = 'panel-bg-grid-loading'; msg.style.gridColumn = 'span 3';
     msg.textContent = 'Could not load backgrounds. Check connection.';
-    grid.appendChild(msg);
-    return;
+    grid.appendChild(msg); return;
   }
 
   catsToShow.forEach(cat => {
     if (activeCat === 'all' && bgCategories.length > 1) {
       const label = document.createElement('div');
-      label.style.cssText = 'grid-column:span 3;font-size:11px;color:#9aa0a6;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;padding:10px 0 4px;';
-      label.textContent = cat.name;
-      grid.appendChild(label);
+      label.style.cssText = 'grid-column:span 3;font-size:11px;color:#b0b0b0;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;padding:10px 0 4px;font-family:"Google Sans",Roboto,arial,sans-serif;';
+      label.textContent = cat.name; grid.appendChild(label);
     }
     cat.items.forEach((item, idx) => {
       const el = document.createElement('div');
       const isSelected = cfg.type === 'preset' && cfg.catName === cat.name && cfg.itemIdx === idx;
       el.className = 'bg-grid-item' + (isSelected ? ' selected' : '');
-      el.innerHTML = `<div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="#292a2d"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><img src="${item.url}" loading="lazy" alt="${escHtml(item.author)}">`;
+      // Use thumbnail suffix for grid previews
+      el.innerHTML = `<div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="#3c3c3c"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><img src="${withSuffix(item.url, THUMB_SUFFIX)}" loading="lazy" alt="${escHtml(item.author)}">`;
       el.addEventListener('click', () => {
-        cfg.type = 'preset';
-        cfg.catName = cat.name;
-        cfg.itemIdx = idx;
-        cfg.lastDate = todayStr();
+        cfg.type='preset'; cfg.catName=cat.name; cfg.itemIdx=idx; cfg.lastDate=todayStr();
         saveCfg(); applyBackground(); syncPanelUI();
       });
       grid.appendChild(el);
@@ -804,32 +878,21 @@ function renderBgGrid() {
   });
 }
 
-// Category tab change
-document.getElementById('panel-cat-tabs').addEventListener('click', e => {
-  const btn = e.target.closest('.panel-cat-tab');
-  if (!btn) return;
-});
-
 // Toggles
 document.getElementById('daily-toggle').addEventListener('change', function() {
-  cfg.dailyRefresh = this.checked;
-  if (cfg.dailyRefresh) cfg.lastDate = '';
-  saveCfg();
+  cfg.dailyRefresh = this.checked; if (cfg.dailyRefresh) cfg.lastDate = ''; saveCfg();
 });
 document.getElementById('dark-toggle').addEventListener('change', function() {
-  cfg.dark = this.checked;
-  saveCfg(); applyBackground();
+  cfg.dark = this.checked; saveCfg(); applyBackground();
 });
 document.getElementById('fadein-toggle').addEventListener('change', function() {
-  cfg.fadeIn = this.checked;
-  saveCfg();
+  cfg.fadeIn = this.checked; saveCfg();
 });
 
 // Reset
 document.getElementById('panel-reset-btn').addEventListener('click', () => {
   cfg = { type:'none', catName:'', itemIdx:0, dailyRefresh:false, lastDate:'', dark:false, fadeIn:false, uploadUrl:'' };
-  saveUpload('');
-  saveCfg(); applyBackground(); syncPanelUI();
+  saveUpload(''); saveCfg(); applyBackground(); syncPanelUI();
 });
 
 // Upload
@@ -837,11 +900,10 @@ document.getElementById('bg-file-input').addEventListener('change', function() {
   const file = this.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    cfg.type = 'upload'; cfg.uploadUrl = e.target.result;
+    cfg.type='upload'; cfg.uploadUrl=e.target.result;
     saveUpload(e.target.result); saveCfg(); applyBackground(); syncPanelUI();
   };
-  reader.readAsDataURL(file);
-  this.value = '';
+  reader.readAsDataURL(file); this.value = '';
 });
 
 // ════════════════════════════════════════════════════
@@ -897,8 +959,7 @@ function renderSection(el, items, key) {
       if (isEditMode) { e.preventDefault(); openModal(key, idx); }
     });
     wrap.querySelector('.app-del-corner').addEventListener('click', e => {
-      e.stopPropagation();
-      appData[key].splice(idx,1); saveData(appData); renderAll();
+      e.stopPropagation(); appData[key].splice(idx,1); saveData(appData); renderAll();
     });
     el.appendChild(wrap);
   });
@@ -925,32 +986,35 @@ document.getElementById('edit-toggle-btn').addEventListener('click', e => {
 // APP MODAL
 // ════════════════════════════════════════════════════
 let modalSection=null, modalIdx=null;
+
 function openModal(sec, idx) {
   modalSection=sec; modalIdx=idx;
-  const isEdit=idx!==null;
-  document.getElementById('modal-title').textContent = isEdit?'Edit shortcut':'Add shortcut';
-  document.getElementById('modal-delete-btn').style.display = isEdit?'block':'none';
+  const isEdit = idx !== null;
+  document.getElementById('modal-title').textContent = isEdit ? 'Edit shortcut' : 'Add shortcut';
+  document.getElementById('modal-delete-btn').style.display = isEdit ? 'block' : 'none';
   if (isEdit) {
-    const it=appData[sec][idx];
-    document.getElementById('modal-name').value=it.name;
-    document.getElementById('modal-url').value=it.url;
-    document.getElementById('modal-icon').value=it.icon||'';
-    document.getElementById('modal-toptarget').checked=!!it.topTarget;
-    updatePreview(it.name,it.url,it.icon||'');
+    const it = appData[sec][idx];
+    document.getElementById('modal-name').value = it.name;
+    document.getElementById('modal-url').value  = it.url;
+    document.getElementById('modal-icon').value = it.icon||'';
+    document.getElementById('modal-toptarget').checked = !!it.topTarget;
+    updatePreview(it.name, it.url, it.icon||'');
   } else {
-    ['modal-name','modal-url','modal-icon'].forEach(id=>document.getElementById(id).value='');
-    document.getElementById('modal-toptarget').checked=false;
+    ['modal-name','modal-url','modal-icon'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('modal-toptarget').checked = false;
     updatePreview('New shortcut','','');
   }
   document.getElementById('modal-backdrop').classList.add('open');
 }
 function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); }
-function updatePreview(name,url,icon) {
-  document.getElementById('preview-name').textContent=name||'New shortcut';
-  const img=document.getElementById('preview-img');
-  img.src=getFavicon(url,icon); img.style.opacity='1';
-  img.onerror=()=>{img.style.opacity='0';};
+
+function updatePreview(name, url, icon) {
+  document.getElementById('preview-name').textContent = name || 'New shortcut';
+  const img = document.getElementById('preview-img');
+  img.src = getFavicon(url, icon); img.style.opacity = '1';
+  img.onerror = () => { img.style.opacity='0'; };
 }
+
 ['modal-name','modal-url','modal-icon'].forEach(id => {
   document.getElementById(id).addEventListener('input', () => updatePreview(
     document.getElementById('modal-name').value,
@@ -961,40 +1025,39 @@ function updatePreview(name,url,icon) {
 document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
 document.getElementById('modal-backdrop').addEventListener('click', e => { if(e.target===document.getElementById('modal-backdrop')) closeModal(); });
 document.getElementById('modal-delete-btn').addEventListener('click', () => {
-  if(modalSection!==null&&modalIdx!==null){appData[modalSection].splice(modalIdx,1);saveData(appData);renderAll();}
+  if(modalSection!==null&&modalIdx!==null){ appData[modalSection].splice(modalIdx,1); saveData(appData); renderAll(); }
   closeModal();
 });
 document.getElementById('modal-save-btn').addEventListener('click', () => {
-  let url=document.getElementById('modal-url').value.trim();
-  const name=document.getElementById('modal-name').value.trim()||url;
-  const icon=document.getElementById('modal-icon').value.trim();
-  const topTarget=document.getElementById('modal-toptarget').checked;
-  if(!url){document.getElementById('modal-url').focus();return;}
-  if(!url.startsWith('http'))url='https://'+url;
-  const item={name:name||url,url,icon,topTarget};
-  if(modalIdx!==null)appData[modalSection][modalIdx]=item;
+  let url = document.getElementById('modal-url').value.trim();
+  const name = document.getElementById('modal-name').value.trim()||url;
+  const icon = document.getElementById('modal-icon').value.trim();
+  const topTarget = document.getElementById('modal-toptarget').checked;
+  if (!url) { document.getElementById('modal-url').focus(); return; }
+  if (!url.startsWith('http')) url = 'https://'+url;
+  const item = { name:name||url, url, icon, topTarget };
+  if (modalIdx!==null) appData[modalSection][modalIdx]=item;
   else appData[modalSection].push(item);
-  saveData(appData);renderAll();closeModal();
+  saveData(appData); renderAll(); closeModal();
 });
 
 // ════════════════════════════════════════════════════
 // SEARCH
 // ════════════════════════════════════════════════════
-const qInput=document.getElementById('q');
-function doSearch(){
-  const v=qInput.value.trim(); if(!v) return;
-  if(/^https?:\/\//i.test(v)){window.location.href=v;return;}
-  if(/^www\./i.test(v)||(/\.[a-z]{2,}$/i.test(v)&&!v.includes(' '))){window.location.href='https://'+v;return;}
+const qInput = document.getElementById('q');
+function doSearch() {
+  const v = qInput.value.trim(); if (!v) return;
+  if (/^https?:\/\//i.test(v)) { window.location.href=v; return; }
+  if (/^www\./i.test(v)||(/\.[a-z]{2,}$/i.test(v)&&!v.includes(' '))) { window.location.href='https://'+v; return; }
   window.location.href='https://www.google.com/search?q='+encodeURIComponent(v)+'&igu=1';
 }
 document.getElementById('s-submit').addEventListener('click', doSearch);
-qInput.addEventListener('keydown', e=>{if(e.key==='Enter')doSearch();});
+qInput.addEventListener('keydown', e => { if(e.key==='Enter') doSearch(); });
 
 // ════════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════════
 async function init() {
-  // Fade-in — apply immediately before anything renders
   if (cfg.fadeIn) {
     document.body.classList.add('fadein');
     requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('fadein-go')));
@@ -1003,13 +1066,10 @@ async function init() {
   applyBackground();
   renderAll();
 
-  // Fetch backgrounds then build grid + tabs
   await fetchBackgrounds();
-  applyDailyRefresh();   // may advance index after fetch
-  applyBackground();     // re-apply in case daily refresh changed it
-
+  applyDailyRefresh();
+  applyBackground();
   buildCatTabs();
-  // If panel is open (won't be on first load, but good practice)
   if (panelOpen) syncPanelUI();
 }
 
