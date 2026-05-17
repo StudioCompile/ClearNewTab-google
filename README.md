@@ -1,4 +1,4 @@
-## This is used to bypass the Securely Chrome extension. 
+## This is used to bypass IFrame Blocking. 
 
 IFrames are not blocked on the new tab page, this is a good way to use this feature while still having a good new tab page. Use the app dock to have bookmarks to embeddable websites, such as zapgames.io and learncodingdaily.com.
 The Google search is also in an iframe, so you can easily search for websites that have Iframe permission. This can also be useful if wallpapers are blocked on the normal new tab page.
