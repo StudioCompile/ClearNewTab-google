@@ -7,4 +7,4 @@ The Google search is also in an iframe, so you can easily search for websites th
 
 ### Put this script in the JS section of the custom HTML.
 
-    ```location.href = "https://studiocompile.github.io/ClearNewTab-google";```
+    location.href = "https://studiocompile.github.io/ClearNewTab-google";
