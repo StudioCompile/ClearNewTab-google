@@ -5,22 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>New Tab</title>
 <style>
+/* ── RESET ── */
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; font-family:arial,sans-serif; overflow:hidden; }
+body { display:flex; flex-direction:column; min-height:100vh; background:#f1f3f4; }
+body.dark { background:#202124; }
 
-html, body {
-  width:100%; height:100%;
-  overflow:hidden;
-  font-family: arial, sans-serif;
-}
-body { display:flex; flex-direction:column; min-height:100vh; }
+/* ── FADE-IN ── */
+body.fadein { opacity:0; }
+body.fadein.fadein-go { transition:opacity 0.25s ease; opacity:1; }
 
-/* ── BACKGROUND ── */
+/* ── BG LAYER ── */
 #bg-layer {
   position:fixed; inset:0; z-index:0;
   background-size:cover; background-position:center; background-repeat:no-repeat;
-  transition:background-image 0.4s;
 }
 body.no-bg #bg-layer { display:none; }
+
+/* ── PANEL OPEN: shift main ── */
+#main {
+  transition:transform 0.3s cubic-bezier(.4,0,.2,1);
+  position:relative; z-index:1;
+}
+body.panel-open #main { transform:translateX(-185px); }
+#bottom-bar { transition:transform 0.3s cubic-bezier(.4,0,.2,1); }
+body.panel-open #bottom-bar { transform:translateX(-185px); }
 
 /* ── CSS CHECKBOX TRICK ── */
 #apps-toggle { display:none; }
@@ -30,11 +39,15 @@ body.no-bg #bg-layer { display:none; }
   position:fixed; top:0; right:0;
   display:flex; align-items:center;
   padding:12px 14px; z-index:20;
+  transition:transform 0.3s cubic-bezier(.4,0,.2,1);
 }
+body.panel-open #topnav { transform:translateX(-185px); }
+
 .tnav-link {
   font-size:13px; color:#fff; text-decoration:none;
   padding:6px 8px; border-radius:4px;
 }
+body.no-bg:not(.dark) .tnav-link { color:rgba(0,0,0,0.7); }
 .tnav-link:hover { text-decoration:underline; }
 
 .tnav-icon-label {
@@ -42,13 +55,12 @@ body.no-bg #bg-layer { display:none; }
   cursor:pointer; display:flex; align-items:center; justify-content:center;
   color:#fff; user-select:none; transition:background 0.15s;
 }
+body.no-bg:not(.dark) .tnav-icon-label { color:rgba(0,0,0,0.54); }
 .tnav-icon-label:hover { background:rgba(255,255,255,0.15); }
+body.no-bg:not(.dark) .tnav-icon-label:hover { background:rgba(0,0,0,0.06); }
 #apps-toggle:checked ~ #topnav .tnav-icon-label { background:rgba(255,255,255,0.2); }
 
-.tnav-pfp {
-  width:32px; height:32px; border-radius:50%;
-  overflow:hidden; margin-left:4px; cursor:pointer; display:block;
-}
+.tnav-pfp { width:32px; height:32px; border-radius:50%; overflow:hidden; margin-left:4px; cursor:pointer; display:block; }
 .tnav-pfp img { width:100%; height:100%; object-fit:cover; display:block; }
 
 /* ── OVERLAY ── */
@@ -59,14 +71,13 @@ body.no-bg #bg-layer { display:none; }
 .appdrop {
   display:none; position:fixed; top:56px; right:10px;
   background:#fff; border-radius:20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,.12), 0 8px 24px rgba(0,0,0,.14);
+  box-shadow:0 2px 6px rgba(0,0,0,.12),0 8px 24px rgba(0,0,0,.14);
   width:300px; z-index:100;
   flex-direction:column;
   font-family:'Google Sans',Roboto,arial,sans-serif;
   overflow:hidden;
   animation:dropIn 0.18s cubic-bezier(.4,0,.2,1);
-  max-height:calc(100vh - 70px);
-  overflow-y:auto;
+  max-height:calc(100vh - 70px); overflow-y:auto;
 }
 #apps-toggle:checked ~ .appdrop { display:flex; }
 
@@ -77,146 +88,79 @@ body.no-bg #bg-layer { display:none; }
 
 .appdrop-header {
   display:flex; align-items:center; justify-content:space-between;
-  padding:16px 14px 10px 18px;
-  border-bottom:1px solid #f1f3f4;
+  padding:16px 14px 10px 18px; border-bottom:1px solid #f1f3f4;
   position:sticky; top:0; background:#fff; z-index:2;
 }
 .appdrop-title { font-size:14px; font-weight:500; color:#202124; letter-spacing:0.01em; }
-
 .appdrop-edit-btn {
-  width:32px; height:32px; border-radius:50%; border:none;
-  background:#f1f3f4; cursor:pointer;
-  display:flex; align-items:center; justify-content:center; color:#5f6368;
-  transition:background 0.12s;
+  width:32px; height:32px; border-radius:50%; border:none; background:#f1f3f4;
+  cursor:pointer; display:flex; align-items:center; justify-content:center; color:#5f6368; transition:background 0.12s;
 }
 .appdrop-edit-btn:hover { background:#e8eaed; }
 .appdrop-edit-btn.active { background:#e8f0fe; color:#1a73e8; }
 
-/* 3-column grid */
 .appdrop-section {
   display:grid; grid-template-columns:repeat(3,1fr);
-  padding:10px 6px 6px;
-  gap:2px;
+  padding:10px 6px 6px; gap:2px;
 }
-
 .appdrop-divider { height:1px; background:#f1f3f4; margin:4px 14px 0; }
-
-.appdrop-section-label {
-  font-size:11px; color:#9aa0a6; font-weight:500;
-  letter-spacing:0.04em; text-transform:uppercase;
-  padding:8px 18px 0;
-}
+.appdrop-section-label { font-size:11px; color:#9aa0a6; font-weight:500; letter-spacing:0.04em; text-transform:uppercase; padding:8px 18px 0; }
 
 .app-item-wrap { position:relative; border-radius:14px; }
-
 .applink {
   display:flex; flex-direction:column; align-items:center;
-  gap:5px; padding:8px 4px 10px;
-  border-radius:14px; text-decoration:none; color:#3c4043;
-  font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif;
-  font-weight:400; transition:background 0.12s;
-  width:100%; text-align:center;
+  gap:5px; padding:8px 4px 10px; border-radius:14px; text-decoration:none; color:#3c4043;
+  font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:400;
+  transition:background 0.12s; width:100%; text-align:center;
 }
 .applink:hover { background:#f1f3f4; }
-
-.appico {
-  width:54px; height:54px; border-radius:50%;
-  background:#f8f9fa; border:1px solid #e8eaed;
-  display:flex; align-items:center; justify-content:center;
-  overflow:hidden; flex-shrink:0;
-}
+.appico { width:54px; height:54px; border-radius:50%; background:#f8f9fa; border:1px solid #e8eaed; display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0; }
 .appico img { width:30px; height:30px; object-fit:contain; border-radius:3px; }
 
 .app-del-corner {
-  display:none;
-  position:absolute; top:2px; right:2px;
+  display:none; position:absolute; top:2px; right:2px;
   width:20px; height:20px; border-radius:50%;
-  background:#c5221f; color:#fff;
-  border:2px solid #fff;
-  cursor:pointer; z-index:5;
-  align-items:center; justify-content:center;
-  box-shadow:0 1px 4px rgba(0,0,0,.25);
-  transition:background 0.12s, transform 0.1s;
-  padding:0; line-height:1;
+  background:#c5221f; color:#fff; border:2px solid #fff; cursor:pointer; z-index:5;
+  align-items:center; justify-content:center; box-shadow:0 1px 4px rgba(0,0,0,.25);
+  transition:background 0.12s, transform 0.1s; padding:0; line-height:1;
 }
 .app-del-corner:hover { background:#a50e0e; transform:scale(1.1); }
 .edit-mode .app-del-corner { display:flex; }
 
 .add-app-btn {
-  display:none; align-items:center; justify-content:center;
-  gap:4px; padding:8px 4px 10px;
-  border-radius:14px; border:1.5px dashed #dadce0;
-  background:none; cursor:pointer; color:#9aa0a6;
-  font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif;
-  flex-direction:column; width:100%;
+  display:none; align-items:center; justify-content:center; gap:4px; padding:8px 4px 10px;
+  border-radius:14px; border:1.5px dashed #dadce0; background:none; cursor:pointer; color:#9aa0a6;
+  font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif; flex-direction:column; width:100%;
   transition:background 0.12s, border-color 0.12s;
 }
 .add-app-btn:hover { background:#f8f9fa; border-color:#bdc1c6; color:#5f6368; }
 .edit-mode .add-app-btn { display:flex; }
 
-.appdrop-more {
-  display:block; text-align:center; padding:8px 0 12px;
-  font-size:12.5px; color:#1a73e8; text-decoration:none;
-  font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500;
-}
+.appdrop-more { display:block; text-align:center; padding:8px 0 12px; font-size:12.5px; color:#1a73e8; text-decoration:none; font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500; }
 .appdrop-more:hover { text-decoration:underline; }
 
-/* ── MODALS ── */
-.modal-backdrop {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.4); z-index:500;
-  align-items:center; justify-content:center;
-}
+/* ── APP EDIT MODAL ── */
+.modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500; align-items:center; justify-content:center; }
 .modal-backdrop.open { display:flex; }
-
-.modal {
-  background:#fff; border-radius:24px;
-  padding:28px 28px 20px;
-  width:360px; max-width:calc(100vw - 32px);
-  box-shadow:0 8px 40px rgba(0,0,0,.25);
-  animation:modalIn 0.18s cubic-bezier(.4,0,.2,1);
-}
-@keyframes modalIn {
-  from { opacity:0; transform:scale(0.94); }
-  to   { opacity:1; transform:scale(1); }
-}
-
-.modal-title {
-  font-size:18px; font-weight:500; color:#202124;
-  font-family:'Google Sans',Roboto,arial,sans-serif;
-  margin-bottom:20px;
-}
+.modal { background:#fff; border-radius:24px; padding:28px 28px 20px; width:360px; max-width:calc(100vw - 32px); box-shadow:0 8px 40px rgba(0,0,0,.25); animation:scaleIn 0.18s cubic-bezier(.4,0,.2,1); }
+@keyframes scaleIn { from{opacity:0;transform:scale(0.94)} to{opacity:1;transform:scale(1)} }
+.modal-title { font-size:18px; font-weight:500; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; margin-bottom:20px; }
 .modal-field { margin-bottom:14px; }
-.modal-field label {
-  display:block; font-size:12px; color:#5f6368;
-  font-family:'Google Sans',Roboto,arial,sans-serif;
-  margin-bottom:5px; font-weight:500; letter-spacing:0.03em;
-}
-.modal-field input[type="text"], .modal-field input[type="url"] {
-  width:100%; padding:10px 14px; border-radius:10px;
-  border:1.5px solid #dadce0; font-size:14px; color:#202124;
-  font-family:arial,sans-serif; outline:none; transition:border 0.15s; background:#fff;
-}
+.modal-field label { display:block; font-size:12px; color:#5f6368; font-family:'Google Sans',Roboto,arial,sans-serif; margin-bottom:5px; font-weight:500; letter-spacing:0.03em; }
+.modal-field input[type="text"], .modal-field input[type="url"] { width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid #dadce0; font-size:14px; color:#202124; font-family:arial,sans-serif; outline:none; transition:border 0.15s; background:#fff; }
 .modal-field input:focus { border-color:#1a73e8; }
-
-.modal-toggle-row {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:20px;
-}
+.modal-toggle-row { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
 .modal-toggle-label { font-size:13px; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; }
-
-.toggle-switch { position:relative; width:44px; height:24px; }
+.toggle-switch { position:relative; width:44px; height:24px; flex-shrink:0; }
 .toggle-switch input { display:none; }
 .toggle-track { position:absolute; inset:0; border-radius:12px; background:#dadce0; cursor:pointer; transition:background 0.2s; }
 .toggle-switch input:checked + .toggle-track { background:#1a73e8; }
 .toggle-thumb { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; pointer-events:none; box-shadow:0 1px 3px rgba(0,0,0,.3); transition:transform 0.2s; }
 .toggle-switch input:checked ~ .toggle-thumb { transform:translateX(20px); }
-
 .modal-preview { display:flex; align-items:center; gap:12px; padding:10px 14px; border-radius:12px; background:#f8f9fa; margin-bottom:18px; }
 .modal-preview .appico { width:36px; height:36px; flex-shrink:0; }
 .modal-preview .appico img { width:20px; height:20px; }
 .modal-preview-name { font-size:13px; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; }
-
 .modal-btns { display:flex; justify-content:flex-end; gap:10px; }
 .modal-btn { padding:9px 20px; border-radius:10px; border:none; font-size:14px; font-family:'Google Sans',Roboto,arial,sans-serif; font-weight:500; cursor:pointer; transition:background 0.12s; }
 .modal-btn.cancel { background:#f1f3f4; color:#444; }
@@ -227,46 +171,30 @@ body.no-bg #bg-layer { display:none; }
 .modal-btn.delete:hover { background:#f5c6c2; }
 
 /* ── MAIN ── */
-#main {
-  flex:1; display:flex; flex-direction:column;
-  align-items:center; padding-top:14vh;
-  position:relative; z-index:1;
-}
+#main { flex:1; display:flex; flex-direction:column; align-items:center; padding-top:14vh; }
 .glogo { width:272px; margin-bottom:28px; cursor:default; }
+body.no-bg:not(.dark) .glogo path { fill:#3c4043; }
+body.dark .glogo path { fill:#e8eaed; }
 
+/* ── SEARCH BAR ── */
 .sbar-wrap { width:582px; max-width:calc(100vw - 48px); }
+.sbar { width:100%; height:44px; background:#fff; border:none; border-radius:24px; display:flex; align-items:center; padding:0 10px 0 12px; gap:8px; box-shadow:0 1px 6px rgba(0,0,0,.22),0 2px 10px rgba(0,0,0,.12); transition:box-shadow 0.15s; }
+.sbar:hover, .sbar:focus-within { box-shadow:0 1px 12px rgba(0,0,0,.32),0 2px 14px rgba(0,0,0,.16); }
+body.dark .sbar { background:#303134; box-shadow:none; }
+body.dark .sbar:hover, body.dark .sbar:focus-within { box-shadow:0 1px 12px rgba(0,0,0,.5); }
 
-.sbar {
-  width:100%; height:44px; background:#fff; border:none;
-  border-radius:24px; display:flex; align-items:center;
-  padding:0 6px 0 12px; gap:8px;
-  box-shadow:0 1px 6px rgba(0,0,0,.22), 0 2px 10px rgba(0,0,0,.12);
-  transition:box-shadow 0.15s;
-}
-.sbar:hover, .sbar:focus-within {
-  box-shadow:0 1px 12px rgba(0,0,0,.32), 0 2px 14px rgba(0,0,0,.16);
-}
-
-.s-submit {
-  width:32px; height:32px; border-radius:50%; border:none;
-  background:transparent; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  color:#9aa0a6; flex-shrink:0; padding:0;
-}
+.s-submit { width:32px; height:32px; border-radius:50%; border:none; background:transparent; cursor:pointer; display:flex; align-items:center; justify-content:center; color:#9aa0a6; flex-shrink:0; padding:0; }
 .s-submit:hover { background:rgba(0,0,0,.06); color:#5f6368; }
-
-#q {
-  flex:1; border:none; outline:none; font-size:16px;
-  color:#202124; background:transparent; caret-color:#202124; min-width:0;
-}
+body.dark .s-submit:hover { background:rgba(255,255,255,.08); }
+#q { flex:1; border:none; outline:none; font-size:16px; color:#202124; background:transparent; caret-color:#202124; min-width:0; }
 #q::placeholder { color:#9aa0a6; font-size:14px; font-weight:300; }
-
+body.dark #q { color:#e8eaed; caret-color:#e8eaed; }
 .s-actions { display:flex; align-items:center; flex-shrink:0; }
 
-/* AI Mode — equal padding all sides */
+/* AI Mode button — fixed: equal padding, slightly more right margin */
 .ai-btn {
-  display:inline-flex; align-items:center; gap:5px;
-  padding:7px 7px 7px 7px;
+  display:inline-flex; align-items:center; gap:6px;
+  padding:7px 8px 7px 7px;
   border-radius:20px; border:none;
   background:#e9eaed;
   font-size:13px; color:#202124;
@@ -276,122 +204,153 @@ body.no-bg #bg-layer { display:none; }
   transition:background 0.15s; flex-shrink:0; line-height:1;
 }
 .ai-btn:hover { background:#dfe0e4; }
-.ai-btn-text { padding-right:3px; }
+body.dark .ai-btn { background:#3c4043; color:#e8eaed; }
+body.dark .ai-btn:hover { background:#4a4e52; }
 
 /* ── BOTTOM BAR ── */
-#bottom-bar {
-  position:fixed; bottom:0; left:0; right:0;
-  display:flex; align-items:flex-end; justify-content:space-between;
-  padding:10px 14px 14px; z-index:10; pointer-events:none;
-}
-
-#photocredit {
-  display:flex; align-items:center; gap:5px; pointer-events:all;
-}
+#bottom-bar { position:fixed; bottom:0; left:0; right:0; display:flex; align-items:flex-end; justify-content:space-between; padding:10px 14px 14px; z-index:10; pointer-events:none; }
+#photocredit { display:flex; align-items:center; gap:5px; pointer-events:all; }
 #photocredit svg { color:rgba(255,255,255,0.75); }
 #photocredit a { font-size:11px; color:rgba(255,255,255,0.8); text-decoration:none; }
 #photocredit a:hover { color:#fff; text-decoration:underline; }
 body.no-bg #photocredit { visibility:hidden; }
 
+/* Pencil/customize button — clean, no blur, Chrome-style */
 #customize-btn {
-  pointer-events:all;
-  width:36px; height:36px; border-radius:50%;
-  background:rgba(0,0,0,0.35); border:none; cursor:pointer;
+  pointer-events:all; width:32px; height:32px; border-radius:50%;
+  background:rgba(0,0,0,0.28); border:none; cursor:pointer;
   display:flex; align-items:center; justify-content:center;
-  color:rgba(255,255,255,0.9);
-  backdrop-filter:blur(4px);
-  transition:background 0.15s, transform 0.15s;
-  box-shadow:0 2px 8px rgba(0,0,0,.2);
+  color:#fff; transition:background 0.15s, opacity 0.2s;
+  position:fixed; bottom:16px; right:16px; z-index:50;
 }
-#customize-btn:hover { background:rgba(0,0,0,0.5); transform:scale(1.06); }
-body.no-bg #customize-btn {
-  background:rgba(0,0,0,0.1); color:#5f6368;
-  box-shadow:0 1px 4px rgba(0,0,0,.1);
-}
-body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
+#customize-btn:hover { background:rgba(0,0,0,0.42); }
+body.no-bg #customize-btn { background:rgba(0,0,0,0.08); color:#5f6368; }
+body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.14); }
+body.dark.no-bg #customize-btn { background:rgba(255,255,255,0.1); color:#e8eaed; }
+body.panel-open #customize-btn { opacity:0; pointer-events:none; }
 
-/* ── BG PANEL ── */
-#bg-panel-backdrop {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.3); z-index:400;
-  align-items:flex-end; justify-content:center;
-  padding-bottom:62px;
-}
-#bg-panel-backdrop.open { display:flex; }
+/* ── CUSTOMIZE PANEL ── */
+#panel-backdrop { display:none; position:fixed; inset:0; z-index:200; }
+body.panel-open #panel-backdrop { display:block; }
 
-#bg-panel {
-  background:#fff; border-radius:20px;
-  padding:18px 18px 16px;
-  width:500px; max-width:calc(100vw - 24px);
-  box-shadow:0 8px 40px rgba(0,0,0,.28);
-  animation:modalIn 0.18s cubic-bezier(.4,0,.2,1);
+#customize-panel {
+  position:fixed; top:0; right:-380px; width:360px; height:100vh;
+  background:#292a2d; color:#e3e3e3; z-index:300; display:flex; flex-direction:column;
+  box-shadow:-4px 0 24px rgba(0,0,0,.35);
+  transition:right 0.3s cubic-bezier(.4,0,.2,1);
   font-family:'Google Sans',Roboto,arial,sans-serif;
+  overflow:hidden;
 }
+body.panel-open #customize-panel { right:0; }
 
-.bg-panel-header {
+/* Panel header */
+.panel-header {
   display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:14px;
+  padding:18px 18px 14px; flex-shrink:0; border-bottom:1px solid rgba(255,255,255,0.08);
 }
-.bg-panel-title { font-size:14px; font-weight:500; color:#202124; }
-.bg-panel-close {
-  width:28px; height:28px; border-radius:50%; border:none;
-  background:#f1f3f4; cursor:pointer; color:#5f6368;
-  display:flex; align-items:center; justify-content:center;
+.panel-title { font-size:16px; font-weight:400; color:#e3e3e3; letter-spacing:0.01em; }
+.panel-close {
+  width:32px; height:32px; border-radius:50%; border:none; background:transparent;
+  cursor:pointer; color:#9aa0a6; display:flex; align-items:center; justify-content:center;
   transition:background 0.12s;
 }
-.bg-panel-close:hover { background:#e8eaed; }
+.panel-close:hover { background:rgba(255,255,255,0.1); color:#e3e3e3; }
 
-.bg-options {
-  display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start;
-  margin-bottom:12px;
-}
+/* Panel scroll area */
+.panel-body { flex:1; overflow-y:auto; padding:0 0 20px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,0.15) transparent; }
+.panel-body::-webkit-scrollbar { width:6px; }
+.panel-body::-webkit-scrollbar-track { background:transparent; }
+.panel-body::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:3px; }
 
-.bg-opt {
-  position:relative; cursor:pointer; border-radius:10px;
-  overflow:visible; flex-shrink:0;
-  border:2.5px solid transparent;
-  transition:border-color 0.15s, transform 0.12s;
-}
-.bg-opt:hover { transform:scale(1.04); }
-.bg-opt.selected { border-color:#1a73e8; }
-.bg-opt.selected::after {
-  content:'✓';
-  position:absolute; top:-6px; right:-6px;
-  width:18px; height:18px; border-radius:50%;
-  background:#1a73e8; color:#fff;
-  font-size:10px; font-weight:700;
-  display:flex; align-items:center; justify-content:center;
-  line-height:18px; text-align:center;
-  z-index:2;
-}
+/* Panel sections */
+.panel-section { padding:18px 18px 0; }
+.panel-section + .panel-section { padding-top:6px; }
+.panel-sep { height:1px; background:rgba(255,255,255,0.08); margin:14px 0 0; }
 
-.bg-opt-inner {
-  width:70px; height:48px; border-radius:8px; overflow:hidden;
-  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:3px;
-}
+.panel-section-label { font-size:11px; font-weight:500; color:#9aa0a6; letter-spacing:0.06em; text-transform:uppercase; margin-bottom:12px; }
 
-.bg-opt-none .bg-opt-inner {
-  background: repeating-conic-gradient(#e8eaed 0% 25%, #fff 0% 50%) 0 0 / 10px 10px;
+/* Current bg preview */
+.panel-bg-preview {
+  width:100%; height:160px; border-radius:14px; overflow:hidden; background:#3c4043;
+  margin-bottom:8px; position:relative; cursor:pointer; border:2px solid transparent;
+  transition:border-color 0.15s;
 }
-.bg-opt-none-label { font-size:10px; color:#5f6368; font-weight:500; }
+.panel-bg-preview:hover { border-color:rgba(255,255,255,0.2); }
+.panel-bg-preview img { width:100%; height:100%; object-fit:cover; display:block; }
+.panel-bg-preview-none { display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; gap:8px; color:#9aa0a6; font-size:13px; }
+.panel-credit { font-size:11px; color:#9aa0a6; margin-bottom:6px; text-align:center; }
 
-.bg-opt-img .bg-opt-inner img {
-  width:100%; height:100%; object-fit:cover; display:block;
+/* Bg grid category tabs */
+.panel-cat-tabs { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+.panel-cat-tab {
+  padding:5px 12px; border-radius:16px; border:1px solid rgba(255,255,255,0.15);
+  background:transparent; color:#9aa0a6; font-size:12px; font-family:'Google Sans',Roboto,arial,sans-serif;
+  cursor:pointer; transition:all 0.15s; white-space:nowrap;
 }
+.panel-cat-tab:hover { background:rgba(255,255,255,0.08); color:#e3e3e3; }
+.panel-cat-tab.active { background:rgba(138,180,248,0.2); border-color:#8ab4f8; color:#8ab4f8; }
 
-.bg-opt-upload .bg-opt-inner {
-  background:#f1f3f4;
-}
-.bg-opt-upload-label { font-size:10px; color:#5f6368; font-weight:500; }
+/* Bg grid */
+.panel-bg-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; }
+.panel-bg-grid-loading { color:#9aa0a6; font-size:12px; padding:12px 0; text-align:center; }
 
-/* daily refresh */
-.bg-daily-row {
-  display:none; align-items:center; justify-content:space-between;
-  padding:10px 12px; background:#f8f9fa; border-radius:10px;
+.bg-grid-item {
+  position:relative; border-radius:8px; overflow:hidden; cursor:pointer;
+  aspect-ratio:16/10; border:2.5px solid transparent; transition:border-color 0.15s, transform 0.12s;
 }
-.bg-daily-row.visible { display:flex; }
-.bg-daily-label { font-size:13px; color:#202124; }
-.bg-daily-sub { font-size:11px; color:#9aa0a6; margin-top:1px; }
+.bg-grid-item:hover { transform:scale(1.03); border-color:rgba(255,255,255,0.3); }
+.bg-grid-item.selected { border-color:#8ab4f8; }
+.bg-grid-item.selected::after {
+  content:''; position:absolute; inset:0; background:rgba(138,180,248,0.15);
+}
+.bg-grid-item .check {
+  display:none; position:absolute; top:3px; right:3px; width:16px; height:16px; border-radius:50%;
+  background:#8ab4f8; z-index:2; align-items:center; justify-content:center;
+}
+.bg-grid-item.selected .check { display:flex; }
+.bg-grid-item img { width:100%; height:100%; object-fit:cover; display:block; }
+
+/* "None" grid item */
+.bg-grid-none {
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
+  background:repeating-conic-gradient(#3a3b3e 0% 25%, #2e2f33 0% 50%) 0 0 / 12px 12px;
+  cursor:pointer; border-radius:8px; aspect-ratio:16/10;
+  border:2.5px solid transparent; transition:border-color 0.15s;
+  font-size:10px; color:#9aa0a6; font-family:'Google Sans',Roboto,arial,sans-serif;
+}
+.bg-grid-none:hover { border-color:rgba(255,255,255,0.3); }
+.bg-grid-none.selected { border-color:#8ab4f8; }
+.bg-grid-none.selected::after { content:''; display:none; }
+
+/* Upload item */
+.bg-grid-upload {
+  display:flex; align-items:center; justify-content:center; flex-direction:column; gap:4px;
+  background:#3c4043; cursor:pointer; border-radius:8px; aspect-ratio:16/10;
+  border:1.5px dashed rgba(255,255,255,0.2); transition:border-color 0.15s, background 0.15s;
+  font-size:10px; color:#9aa0a6; font-family:'Google Sans',Roboto,arial,sans-serif;
+}
+.bg-grid-upload:hover { background:#48494c; border-color:rgba(255,255,255,0.35); color:#c8c8c8; }
+.bg-grid-upload.selected { border-color:#8ab4f8; }
+
+/* Panel toggle rows */
+.panel-toggle-row { display:flex; align-items:center; justify-content:space-between; padding:10px 0; }
+.panel-toggle-row + .panel-toggle-row { border-top:1px solid rgba(255,255,255,0.06); }
+.panel-toggle-info {}
+.panel-toggle-name { font-size:13px; color:#e3e3e3; }
+.panel-toggle-sub { font-size:11px; color:#9aa0a6; margin-top:2px; }
+
+/* Dark toggle track uses blue */
+.dark-track {}
+.toggle-switch input:checked + .toggle-track { background:#8ab4f8; }
+
+/* Panel reset btn */
+.panel-reset-btn {
+  width:calc(100% - 36px); margin:14px 18px 0; padding:10px; border-radius:10px; border:none;
+  background:rgba(255,255,255,0.06); color:#9aa0a6; cursor:pointer; font-size:13px;
+  font-family:'Google Sans',Roboto,arial,sans-serif; display:flex; align-items:center; justify-content:space-between;
+  transition:background 0.12s;
+}
+.panel-reset-btn:hover { background:rgba(255,255,255,0.1); color:#e3e3e3; }
 
 #bg-file-input { display:none; }
 </style>
@@ -405,20 +364,16 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
 <nav id="topnav">
   <a class="tnav-link" href="https://mail.google.com" target="_self">Gmail</a>
   <a class="tnav-link" href="https://www.google.com/imghp" target="_self">Images</a>
-  <label class="tnav-icon-label" for="apps-toggle" title="Google apps" aria-label="Google apps">
+  <label class="tnav-icon-label" for="apps-toggle" title="Google apps">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="3" y="3" width="4" height="4" rx="0.5"/>
-      <rect x="10" y="3" width="4" height="4" rx="0.5"/>
-      <rect x="17" y="3" width="4" height="4" rx="0.5"/>
-      <rect x="3" y="10" width="4" height="4" rx="0.5"/>
-      <rect x="10" y="10" width="4" height="4" rx="0.5"/>
-      <rect x="17" y="10" width="4" height="4" rx="0.5"/>
-      <rect x="3" y="17" width="4" height="4" rx="0.5"/>
-      <rect x="10" y="17" width="4" height="4" rx="0.5"/>
+      <rect x="3" y="3" width="4" height="4" rx="0.5"/><rect x="10" y="3" width="4" height="4" rx="0.5"/>
+      <rect x="17" y="3" width="4" height="4" rx="0.5"/><rect x="3" y="10" width="4" height="4" rx="0.5"/>
+      <rect x="10" y="10" width="4" height="4" rx="0.5"/><rect x="17" y="10" width="4" height="4" rx="0.5"/>
+      <rect x="3" y="17" width="4" height="4" rx="0.5"/><rect x="10" y="17" width="4" height="4" rx="0.5"/>
       <rect x="17" y="17" width="4" height="4" rx="0.5"/>
     </svg>
   </label>
-  <a class="tnav-pfp" href="https://myaccount.google.com/" target="_self" aria-label="Google Account">
+  <a class="tnav-pfp" href="https://myaccount.google.com/" target="_self">
     <img src="https://lh3.googleusercontent.com/-hCKN--em-Qw/AAAAAAAAAAI/AAAAAAAAAAA/ALKGfkmP4VPG-a-cGDymnXMvOqRKZip8IA/photo.jpg?sz=46" alt="Profile">
   </a>
 </nav>
@@ -430,9 +385,7 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
   <div class="appdrop-header">
     <span class="appdrop-title">Your favorites</span>
     <button class="appdrop-edit-btn" id="edit-toggle-btn" title="Edit shortcuts">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
-      </svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
     </button>
   </div>
   <div class="appdrop-section" id="section-favorites"></div>
@@ -442,7 +395,7 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
   <a class="appdrop-more" href="https://www.google.com/intl/en/about/products" target="_self">More from Google</a>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- APP EDIT MODAL -->
 <div class="modal-backdrop" id="modal-backdrop">
   <div class="modal">
     <div class="modal-title" id="modal-title">Add shortcut</div>
@@ -450,25 +403,15 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
       <div class="appico"><img id="preview-img" src="" alt=""></div>
       <span class="modal-preview-name" id="preview-name">New shortcut</span>
     </div>
-    <div class="modal-field">
-      <label>Name</label>
-      <input type="text" id="modal-name" placeholder="e.g. Gmail" autocomplete="off">
-    </div>
-    <div class="modal-field">
-      <label>URL</label>
-      <input type="url" id="modal-url" placeholder="https://example.com" autocomplete="off">
-    </div>
+    <div class="modal-field"><label>Name</label><input type="text" id="modal-name" placeholder="e.g. Gmail" autocomplete="off"></div>
+    <div class="modal-field"><label>URL</label><input type="url" id="modal-url" placeholder="https://example.com" autocomplete="off"></div>
     <div class="modal-field">
       <label>Icon URL <span style="font-weight:400;color:#aaa">(leave blank to auto-fetch)</span></label>
       <input type="url" id="modal-icon" placeholder="https://example.com/icon.png" autocomplete="off">
     </div>
     <div class="modal-toggle-row">
       <div class="modal-toggle-label">Open in top frame</div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="modal-toptarget">
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
+      <label class="toggle-switch"><input type="checkbox" id="modal-toptarget"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
     </div>
     <div class="modal-btns">
       <button class="modal-btn delete" id="modal-delete-btn" style="display:none">Delete</button>
@@ -478,66 +421,82 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
   </div>
 </div>
 
-<!-- BG PANEL -->
-<div id="bg-panel-backdrop">
-  <div id="bg-panel">
-    <div class="bg-panel-header">
-      <span class="bg-panel-title">Customize background</span>
-      <button class="bg-panel-close" id="bg-panel-close">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-        </svg>
-      </button>
-    </div>
+<!-- CUSTOMIZE PANEL BACKDROP -->
+<div id="panel-backdrop"></div>
 
-    <div class="bg-options" id="bg-options">
-      <!-- None -->
-      <div class="bg-opt bg-opt-none selected" id="bgopt-none" data-type="none">
-        <div class="bg-opt-inner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#bdc1c6">
-            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-          </svg>
-          <div class="bg-opt-none-label">None</div>
+<!-- CUSTOMIZE PANEL -->
+<div id="customize-panel">
+  <div class="panel-header">
+    <span class="panel-title">Customize Chrome</span>
+    <button class="panel-close" id="panel-close-btn" aria-label="Close">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
+
+  <div class="panel-body">
+    <!-- Appearance -->
+    <div class="panel-section">
+      <div class="panel-section-label">Appearance</div>
+
+      <!-- Current bg preview -->
+      <div class="panel-bg-preview" id="panel-preview">
+        <div class="panel-bg-preview-none" id="panel-preview-none">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.3"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+          <span>No background</span>
         </div>
+        <img id="panel-preview-img" src="" alt="" style="display:none">
       </div>
-      <!-- Nature 0 -->
-      <div class="bg-opt bg-opt-img" data-type="nature" data-idx="0">
-        <div class="bg-opt-inner"><img src="https://lh5.googleusercontent.com/proxy/YlTm0oFdqY2F4qXyhdun8WSyVIstn5cICXd_eWXXu0hihdEagV1bnvtkNp-XKNF5oyw3XvhknLlSQv9Z0OUw5_Y-y00dOrLs9N7GNqfn6--x=w3840-h2160-p-k-no-nd-mv" alt="Nature 1"></div>
+      <div class="panel-credit" id="panel-credit"></div>
+
+      <!-- Category filter tabs -->
+      <div class="panel-cat-tabs" id="panel-cat-tabs">
+        <button class="panel-cat-tab active" data-cat="all">All</button>
+        <!-- more tabs injected by JS after fetch -->
       </div>
-      <!-- Nature 1 -->
-      <div class="bg-opt bg-opt-img" data-type="nature" data-idx="1">
-        <div class="bg-opt-inner"><img src="https://lh6.googleusercontent.com/proxy/6bwfw7G3s6z6tMlUomuQLiTy3UlyEFVeYkS_dxHejBYtZ0qAKCg4JR7BIktep6ppSQvigLdNLY1aSSVXzlBhpvpt3sqf9e16LmfStZig0CcV=w3840-h2160-p-k-no-nd-mv" alt="Nature 2"></div>
-      </div>
-      <!-- Nature 2 -->
-      <div class="bg-opt bg-opt-img" data-type="nature" data-idx="2">
-        <div class="bg-opt-inner"><img src="https://lh3.googleusercontent.com/proxy/3EnTIe8unY7R83kivrdseZAKyxWp0UOwzpJidrBwyDimvH2o6Lcta5e5Eo9ZC17Rto6Ks8vxRaTyQc3ESkAjFQPYbHr9RJn3LDzFf6UgiFKS=w3840-h2160-p-k-no-nd-mv" alt="Nature 3"></div>
-      </div>
-      <!-- Nature 3 -->
-      <div class="bg-opt bg-opt-img" data-type="nature" data-idx="3">
-        <div class="bg-opt-inner"><img src="https://lh4.googleusercontent.com/proxy/kFIJNnm2DMbS3B5LXaIdm2JKI6twGWwmzQbcJCfqTfuaH_ULD50v1Z3BGPEF32xTPRvgGLx492zcy_kcatCde2wmz-9ZYFqifbJRMl2DzyE=w3840-h2160-p-k-no-nd-mv" alt="Nature 4"></div>
-      </div>
-      <!-- Upload -->
-      <div class="bg-opt bg-opt-upload" id="bgopt-upload" data-type="upload">
-        <div class="bg-opt-inner">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="#5f6368">
-            <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-          </svg>
-          <div class="bg-opt-upload-label">Upload</div>
-        </div>
+
+      <!-- Bg grid -->
+      <div class="panel-bg-grid" id="panel-bg-grid">
+        <div class="panel-bg-grid-loading" style="grid-column:span 3">Loading backgrounds…</div>
       </div>
     </div>
 
-    <div class="bg-daily-row" id="bg-daily-row">
-      <div>
-        <div class="bg-daily-label">Refresh daily</div>
-        <div class="bg-daily-sub">Cycle to a new nature photo each day</div>
+    <div class="panel-sep"></div>
+
+    <!-- Options -->
+    <div class="panel-section" style="padding-top:14px;">
+      <div class="panel-section-label">Options</div>
+
+      <div class="panel-toggle-row" id="daily-row" style="display:none">
+        <div class="panel-toggle-info">
+          <div class="panel-toggle-name">Refresh daily</div>
+          <div class="panel-toggle-sub">Cycle to a new photo each day</div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="daily-toggle"><div class="toggle-track dark-track"></div><div class="toggle-thumb"></div></label>
       </div>
-      <label class="toggle-switch">
-        <input type="checkbox" id="bg-daily-toggle">
-        <div class="toggle-track"></div>
-        <div class="toggle-thumb"></div>
-      </label>
+
+      <div class="panel-toggle-row">
+        <div class="panel-toggle-info">
+          <div class="panel-toggle-name">Dark mode</div>
+          <div class="panel-toggle-sub">Dark search bar and UI</div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="dark-toggle"><div class="toggle-track dark-track"></div><div class="toggle-thumb"></div></label>
+      </div>
+
+      <div class="panel-toggle-row">
+        <div class="panel-toggle-info">
+          <div class="panel-toggle-name">Smooth page load</div>
+          <div class="panel-toggle-sub">Fade in to hide loading flash</div>
+        </div>
+        <label class="toggle-switch"><input type="checkbox" id="fadein-toggle"><div class="toggle-track dark-track"></div><div class="toggle-thumb"></div></label>
+      </div>
     </div>
+
+    <div class="panel-sep"></div>
+
+    <button class="panel-reset-btn" id="panel-reset-btn">
+      <span>Reset to Default Chrome</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.5"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+    </button>
   </div>
 </div>
 
@@ -559,16 +518,15 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
       <button class="s-submit" id="s-submit" type="button" aria-label="Search">
         <span style="font-size:24px;font-weight:400;color:#5f6368;line-height:1">+</span>
       </button>
-      <input id="q" type="text" autocomplete="off" spellcheck="false"
-             placeholder="Ask Google" aria-label="Ask Google">
+      <input id="q" type="text" autocomplete="off" spellcheck="false" placeholder="Ask Google" aria-label="Ask Google">
       <div class="s-actions">
         <a class="ai-btn" href="https://www.google.com/search?udm=50&igu=1" target="_self">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
             <circle cx="10" cy="10" r="6" stroke="#5f6368" stroke-width="2"/>
             <line x1="14.5" y1="14.5" x2="20" y2="20" stroke="#5f6368" stroke-width="2" stroke-linecap="round"/>
             <path d="M17 3 L17.6 5 L19.6 5.6 L17.6 6.2 L17 8.2 L16.4 6.2 L14.4 5.6 L16.4 5Z" fill="#4285f4"/>
           </svg>
-          <span class="ai-btn-text">AI Mode</span>
+          AI Mode
         </a>
       </div>
     </div>
@@ -581,154 +539,340 @@ body.no-bg #customize-btn:hover { background:rgba(0,0,0,0.16); }
     <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
       <path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>
     </svg>
-    <a href="https://unsplash.com" target="_self">Photo by Giulio Rosso Chiosa</a>
+    <a id="photocredit-link" href="#" target="_self">Photo</a>
   </div>
-  <button id="customize-btn" title="Customize background" aria-label="Customize background">
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+  <button id="customize-btn" title="Customize Chrome" aria-label="Customize Chrome">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
     </svg>
   </button>
 </div>
 
 <script>
-const NATURE_URLS = [
-  'https://lh5.googleusercontent.com/proxy/YlTm0oFdqY2F4qXyhdun8WSyVIstn5cICXd_eWXXu0hihdEagV1bnvtkNp-XKNF5oyw3XvhknLlSQv9Z0OUw5_Y-y00dOrLs9N7GNqfn6--x=w3840-h2160-p-k-no-nd-mv',
-  'https://lh6.googleusercontent.com/proxy/6bwfw7G3s6z6tMlUomuQLiTy3UlyEFVeYkS_dxHejBYtZ0qAKCg4JR7BIktep6ppSQvigLdNLY1aSSVXzlBhpvpt3sqf9e16LmfStZig0CcV=w3840-h2160-p-k-no-nd-mv',
-  'https://lh3.googleusercontent.com/proxy/3EnTIe8unY7R83kivrdseZAKyxWp0UOwzpJidrBwyDimvH2o6Lcta5e5Eo9ZC17Rto6Ks8vxRaTyQc3ESkAjFQPYbHr9RJn3LDzFf6UgiFKS=w3840-h2160-p-k-no-nd-mv',
-  'https://lh4.googleusercontent.com/proxy/kFIJNnm2DMbS3B5LXaIdm2JKI6twGWwmzQbcJCfqTfuaH_ULD50v1Z3BGPEF32xTPRvgGLx492zcy_kcatCde2wmz-9ZYFqifbJRMl2DzyE=w3840-h2160-p-k-no-nd-mv'
-];
+// ════════════════════════════════════════════════════
+// BACKGROUNDS — fetched and parsed at runtime
+// ════════════════════════════════════════════════════
+const BG_MD_URL = 'https://gist.githubusercontent.com/nondebug/9e68ecdc517e7d78174f485131501806/raw/4e3448746d9c971b09a6414094ffa8eb50e9da04/chrome-ntp-backgrounds.md';
 
-const DEFAULTS = {
-  favorites: [
-    { name:'Account',   url:'https://myaccount.google.com/',  icon:'', topTarget:false },
-    { name:'Gmail',     url:'https://mail.google.com',         icon:'', topTarget:false },
-    { name:'Drive',     url:'https://drive.google.com',        icon:'', topTarget:false },
-    { name:'Classroom', url:'https://classroom.google.com',    icon:'', topTarget:false },
-    { name:'Docs',      url:'https://docs.google.com',         icon:'', topTarget:false },
-    { name:'Sheets',    url:'https://sheets.google.com',       icon:'', topTarget:false },
-    { name:'Slides',    url:'https://slides.google.com',       icon:'', topTarget:false },
-    { name:'Calendar',  url:'https://calendar.google.com',     icon:'', topTarget:false },
-    { name:'Meet',      url:'https://meet.google.com',         icon:'', topTarget:false },
-  ],
-  mysites: [
-    { name:'AZ Games',     url:'https://azgames.io',           icon:'', topTarget:false },
-    { name:'Zap Games',    url:'https://zapgames.io',          icon:'', topTarget:false },
-    { name:'Learn Coding', url:'https://learncodingdaily.com', icon:'', topTarget:false },
-  ]
-};
+// categories: { name: string, items: [{url, author}] }
+let bgCategories = [];
+let allBgItems = []; // flat list with .category
 
-// ── BG CONFIG ──
-function loadBgConfig() {
-  try { const r = localStorage.getItem('newtab_bg'); if (r) return JSON.parse(r); } catch(e) {}
-  return { type:'none', natureIdx:0, dailyRefresh:false, lastDate:'' };
+async function fetchBackgrounds() {
+  try {
+    const res = await fetch(BG_MD_URL);
+    const md = await res.text();
+    bgCategories = parseMarkdown(md);
+    allBgItems = [];
+    bgCategories.forEach(cat => cat.items.forEach(item => allBgItems.push({ ...item, category: cat.name })));
+  } catch(e) {
+    console.warn('Could not fetch backgrounds:', e);
+    bgCategories = [];
+    allBgItems = [];
+  }
 }
-function saveBgConfig(cfg) {
-  try { localStorage.setItem('newtab_bg', JSON.stringify({ type:cfg.type, natureIdx:cfg.natureIdx, dailyRefresh:cfg.dailyRefresh, lastDate:cfg.lastDate })); } catch(e) {}
-}
-function loadUploadUrl() { try { return localStorage.getItem('newtab_bg_upload') || ''; } catch(e) { return ''; } }
-function saveUploadUrl(u) { try { localStorage.setItem('newtab_bg_upload', u); } catch(e) {} }
 
-let bgConfig = loadBgConfig();
-bgConfig.uploadUrl = loadUploadUrl();
-
-function todayStr() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
-
-function applyDailyRefresh() {
-  if (bgConfig.type === 'nature' && bgConfig.dailyRefresh) {
-    const today = todayStr();
-    if (bgConfig.lastDate !== today) {
-      bgConfig.natureIdx = (bgConfig.natureIdx + 1) % NATURE_URLS.length;
-      bgConfig.lastDate = today;
-      saveBgConfig(bgConfig);
+function parseMarkdown(md) {
+  const cats = [];
+  let currentCat = null;
+  const lines = md.split('\n');
+  // [Photo by Author](URL) or [Photo by Author](URL) ([context](...))
+  const photoRe = /\[Photo by ([^\]]+)\]\((https?:\/\/[^)]+)\)/;
+  for (const line of lines) {
+    const h = line.match(/^#+ (.+)$/);
+    if (h) {
+      currentCat = { name: h[1].trim(), items: [] };
+      cats.push(currentCat);
+      continue;
+    }
+    if (currentCat) {
+      const m = line.match(photoRe);
+      if (m) currentCat.items.push({ author: m[1].trim(), url: m[2].trim() });
     }
   }
+  return cats.filter(c => c.items.length > 0);
+}
+
+// ════════════════════════════════════════════════════
+// BG CONFIG — localStorage
+// ════════════════════════════════════════════════════
+function loadCfg() {
+  try { const r = localStorage.getItem('nt_cfg2'); if (r) return JSON.parse(r); } catch(e) {}
+  return { type:'none', catName:'', itemIdx:0, dailyRefresh:false, lastDate:'', dark:false, fadeIn:false };
+}
+function saveCfg() {
+  try { localStorage.setItem('nt_cfg2', JSON.stringify(cfg)); } catch(e) {}
+}
+function loadUpload() { try { return localStorage.getItem('nt_upload')||''; } catch(e) { return ''; } }
+function saveUpload(u) { try { localStorage.setItem('nt_upload', u); } catch(e) {} }
+
+let cfg = loadCfg();
+cfg.uploadUrl = loadUpload();
+
+function todayStr() { const d=new Date(); return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`; }
+
+function applyDailyRefresh() {
+  if ((cfg.type==='preset') && cfg.dailyRefresh) {
+    const today = todayStr();
+    if (cfg.lastDate !== today) {
+      // advance within same category
+      const cat = bgCategories.find(c => c.name === cfg.catName);
+      if (cat && cat.items.length > 0) {
+        cfg.itemIdx = (cfg.itemIdx + 1) % cat.items.length;
+        cfg.lastDate = today;
+        saveCfg();
+      }
+    }
+  }
+}
+
+function getCurrentItem() {
+  if (cfg.type !== 'preset') return null;
+  const cat = bgCategories.find(c => c.name === cfg.catName);
+  if (!cat || !cat.items[cfg.itemIdx]) return null;
+  return cat.items[cfg.itemIdx];
 }
 
 function applyBackground() {
   const layer = document.getElementById('bg-layer');
-  if (bgConfig.type === 'none') {
+  const credit = document.getElementById('photocredit-link');
+  if (cfg.type === 'none') {
     document.body.classList.add('no-bg');
     layer.style.backgroundImage = '';
-  } else if (bgConfig.type === 'nature') {
-    document.body.classList.remove('no-bg');
-    layer.style.backgroundImage = `url('${NATURE_URLS[bgConfig.natureIdx]}')`;
-  } else if (bgConfig.type === 'upload' && bgConfig.uploadUrl) {
-    document.body.classList.remove('no-bg');
-    layer.style.backgroundImage = `url('${bgConfig.uploadUrl}')`;
-  } else {
-    document.body.classList.add('no-bg');
-    layer.style.backgroundImage = '';
-  }
-}
-
-// ── BG PANEL ──
-const bgPanelBackdrop = document.getElementById('bg-panel-backdrop');
-
-function openBgPanel() { syncBgPanelUI(); bgPanelBackdrop.classList.add('open'); }
-function closeBgPanel() { bgPanelBackdrop.classList.remove('open'); }
-
-function syncBgPanelUI() {
-  document.querySelectorAll('.bg-opt').forEach(el => el.classList.remove('selected'));
-  if (bgConfig.type === 'none') {
-    document.getElementById('bgopt-none').classList.add('selected');
-  } else if (bgConfig.type === 'nature') {
-    document.querySelectorAll('.bg-opt[data-type="nature"]').forEach(opt => {
-      if (parseInt(opt.dataset.idx) === bgConfig.natureIdx) opt.classList.add('selected');
-    });
-  } else if (bgConfig.type === 'upload') {
-    document.getElementById('bgopt-upload').classList.add('selected');
-  }
-  const daily = document.getElementById('bg-daily-row');
-  daily.classList.toggle('visible', bgConfig.type === 'nature');
-  document.getElementById('bg-daily-toggle').checked = bgConfig.dailyRefresh;
-}
-
-document.querySelectorAll('.bg-opt').forEach(opt => {
-  opt.addEventListener('click', () => {
-    const type = opt.dataset.type;
-    if (type === 'upload') { document.getElementById('bg-file-input').click(); return; }
-    if (type === 'none') {
-      bgConfig.type = 'none';
-    } else if (type === 'nature') {
-      bgConfig.type = 'nature';
-      bgConfig.natureIdx = parseInt(opt.dataset.idx);
-      bgConfig.lastDate = todayStr();
+    credit.textContent = '';
+  } else if (cfg.type === 'preset') {
+    const item = getCurrentItem();
+    if (item) {
+      document.body.classList.remove('no-bg');
+      layer.style.backgroundImage = `url('${item.url}')`;
+      credit.textContent = `Photo by ${item.author}`;
+      credit.href = item.url;
     }
-    saveBgConfig(bgConfig); applyBackground(); syncBgPanelUI();
+  } else if (cfg.type === 'upload' && cfg.uploadUrl) {
+    document.body.classList.remove('no-bg');
+    layer.style.backgroundImage = `url('${cfg.uploadUrl}')`;
+    credit.textContent = 'Custom background';
+    credit.href = '#';
+  }
+  // Dark mode
+  document.body.classList.toggle('dark', !!cfg.dark);
+}
+
+// ════════════════════════════════════════════════════
+// CUSTOMIZE PANEL
+// ════════════════════════════════════════════════════
+let activeCat = 'all'; // 'all' or category name
+let panelOpen = false;
+
+function openPanel() {
+  panelOpen = true;
+  document.body.classList.add('panel-open');
+  syncPanelUI();
+}
+function closePanel() {
+  panelOpen = false;
+  document.body.classList.remove('panel-open');
+}
+
+document.getElementById('customize-btn').addEventListener('click', openPanel);
+document.getElementById('panel-close-btn').addEventListener('click', closePanel);
+document.getElementById('panel-backdrop').addEventListener('click', closePanel);
+
+function syncPanelUI() {
+  // Preview
+  const previewNone = document.getElementById('panel-preview-none');
+  const previewImg = document.getElementById('panel-preview-img');
+  const panelCredit = document.getElementById('panel-credit');
+
+  if (cfg.type === 'none') {
+    previewNone.style.display = 'flex';
+    previewImg.style.display = 'none';
+    panelCredit.textContent = '';
+  } else if (cfg.type === 'preset') {
+    const item = getCurrentItem();
+    if (item) {
+      previewNone.style.display = 'none';
+      previewImg.style.display = 'block';
+      previewImg.src = item.url;
+      panelCredit.textContent = `Photo by ${item.author}`;
+    }
+  } else if (cfg.type === 'upload') {
+    previewNone.style.display = 'none';
+    previewImg.style.display = 'block';
+    previewImg.src = cfg.uploadUrl;
+    panelCredit.textContent = 'Custom image';
+  }
+
+  // Daily refresh row - only for preset
+  document.getElementById('daily-row').style.display = cfg.type === 'preset' ? 'flex' : 'none';
+  document.getElementById('daily-toggle').checked = cfg.dailyRefresh;
+  document.getElementById('dark-toggle').checked = !!cfg.dark;
+  document.getElementById('fadein-toggle').checked = !!cfg.fadeIn;
+
+  renderBgGrid();
+}
+
+function buildCatTabs() {
+  const tabs = document.getElementById('panel-cat-tabs');
+  // Keep 'All' tab, remove old dynamic ones
+  tabs.innerHTML = '<button class="panel-cat-tab" data-cat="all">All</button>';
+  bgCategories.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'panel-cat-tab';
+    btn.dataset.cat = cat.name;
+    btn.textContent = cat.name;
+    tabs.appendChild(btn);
   });
+  // Upload tab
+  const upBtn = document.createElement('button');
+  upBtn.className = 'panel-cat-tab';
+  upBtn.dataset.cat = '__upload';
+  upBtn.textContent = 'Upload';
+  tabs.appendChild(upBtn);
+
+  tabs.querySelectorAll('.panel-cat-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      activeCat = btn.dataset.cat;
+      if (activeCat === '__upload') {
+        document.getElementById('bg-file-input').click();
+        return;
+      }
+      syncCatTabs();
+      renderBgGrid();
+    });
+  });
+  syncCatTabs();
+}
+
+function syncCatTabs() {
+  document.querySelectorAll('.panel-cat-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.cat === activeCat);
+  });
+}
+
+function renderBgGrid() {
+  const grid = document.getElementById('panel-bg-grid');
+  grid.innerHTML = '';
+
+  // None option
+  const noneEl = document.createElement('div');
+  noneEl.className = 'bg-grid-none' + (cfg.type === 'none' ? ' selected' : '');
+  noneEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.4"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg><span>None</span>`;
+  noneEl.addEventListener('click', () => { cfg.type='none'; saveCfg(); applyBackground(); syncPanelUI(); });
+  if (activeCat === 'all' || activeCat === 'all') grid.appendChild(noneEl);
+
+  // Upload option
+  const uploadEl = document.createElement('div');
+  uploadEl.className = 'bg-grid-upload' + (cfg.type === 'upload' ? ' selected' : '');
+  uploadEl.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" opacity="0.7"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg><span>Upload</span>`;
+  uploadEl.addEventListener('click', () => document.getElementById('bg-file-input').click());
+  if (activeCat === 'all') grid.appendChild(uploadEl);
+
+  // Items
+  const catsToShow = activeCat === 'all' ? bgCategories : bgCategories.filter(c => c.name === activeCat);
+
+  if (bgCategories.length === 0) {
+    const msg = document.createElement('div');
+    msg.className = 'panel-bg-grid-loading';
+    msg.style.gridColumn = 'span 3';
+    msg.textContent = 'Could not load backgrounds. Check connection.';
+    grid.appendChild(msg);
+    return;
+  }
+
+  catsToShow.forEach(cat => {
+    if (activeCat === 'all' && bgCategories.length > 1) {
+      const label = document.createElement('div');
+      label.style.cssText = 'grid-column:span 3;font-size:11px;color:#9aa0a6;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;padding:10px 0 4px;';
+      label.textContent = cat.name;
+      grid.appendChild(label);
+    }
+    cat.items.forEach((item, idx) => {
+      const el = document.createElement('div');
+      const isSelected = cfg.type === 'preset' && cfg.catName === cat.name && cfg.itemIdx === idx;
+      el.className = 'bg-grid-item' + (isSelected ? ' selected' : '');
+      el.innerHTML = `<div class="check"><svg width="10" height="10" viewBox="0 0 24 24" fill="#292a2d"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><img src="${item.url}" loading="lazy" alt="${escHtml(item.author)}">`;
+      el.addEventListener('click', () => {
+        cfg.type = 'preset';
+        cfg.catName = cat.name;
+        cfg.itemIdx = idx;
+        cfg.lastDate = todayStr();
+        saveCfg(); applyBackground(); syncPanelUI();
+      });
+      grid.appendChild(el);
+    });
+  });
+}
+
+// Category tab change
+document.getElementById('panel-cat-tabs').addEventListener('click', e => {
+  const btn = e.target.closest('.panel-cat-tab');
+  if (!btn) return;
 });
 
+// Toggles
+document.getElementById('daily-toggle').addEventListener('change', function() {
+  cfg.dailyRefresh = this.checked;
+  if (cfg.dailyRefresh) cfg.lastDate = '';
+  saveCfg();
+});
+document.getElementById('dark-toggle').addEventListener('change', function() {
+  cfg.dark = this.checked;
+  saveCfg(); applyBackground();
+});
+document.getElementById('fadein-toggle').addEventListener('change', function() {
+  cfg.fadeIn = this.checked;
+  saveCfg();
+});
+
+// Reset
+document.getElementById('panel-reset-btn').addEventListener('click', () => {
+  cfg = { type:'none', catName:'', itemIdx:0, dailyRefresh:false, lastDate:'', dark:false, fadeIn:false, uploadUrl:'' };
+  saveUpload('');
+  saveCfg(); applyBackground(); syncPanelUI();
+});
+
+// Upload
 document.getElementById('bg-file-input').addEventListener('change', function() {
   const file = this.files[0]; if (!file) return;
   const reader = new FileReader();
   reader.onload = e => {
-    bgConfig.type = 'upload';
-    bgConfig.uploadUrl = e.target.result;
-    saveUploadUrl(e.target.result);
-    saveBgConfig(bgConfig); applyBackground(); syncBgPanelUI();
+    cfg.type = 'upload'; cfg.uploadUrl = e.target.result;
+    saveUpload(e.target.result); saveCfg(); applyBackground(); syncPanelUI();
   };
   reader.readAsDataURL(file);
   this.value = '';
 });
 
-document.getElementById('bg-daily-toggle').addEventListener('change', function() {
-  bgConfig.dailyRefresh = this.checked;
-  if (bgConfig.dailyRefresh) bgConfig.lastDate = '';
-  saveBgConfig(bgConfig);
-});
+// ════════════════════════════════════════════════════
+// APP DATA
+// ════════════════════════════════════════════════════
+const DEFAULTS = {
+  favorites: [
+    {name:'Account',url:'https://myaccount.google.com/',icon:'',topTarget:false},
+    {name:'Gmail',url:'https://mail.google.com',icon:'',topTarget:false},
+    {name:'Drive',url:'https://drive.google.com',icon:'',topTarget:false},
+    {name:'Classroom',url:'https://classroom.google.com',icon:'',topTarget:false},
+    {name:'Docs',url:'https://docs.google.com',icon:'',topTarget:false},
+    {name:'Sheets',url:'https://sheets.google.com',icon:'',topTarget:false},
+    {name:'Slides',url:'https://slides.google.com',icon:'',topTarget:false},
+    {name:'Calendar',url:'https://calendar.google.com',icon:'',topTarget:false},
+    {name:'Meet',url:'https://meet.google.com',icon:'',topTarget:false},
+  ],
+  mysites: [
+    {name:'AZ Games',url:'https://azgames.io',icon:'',topTarget:false},
+    {name:'Zap Games',url:'https://zapgames.io',icon:'',topTarget:false},
+    {name:'Learn Coding',url:'https://learncodingdaily.com',icon:'',topTarget:false},
+  ]
+};
 
-document.getElementById('customize-btn').addEventListener('click', openBgPanel);
-document.getElementById('bg-panel-close').addEventListener('click', closeBgPanel);
-bgPanelBackdrop.addEventListener('click', e => { if (e.target === bgPanelBackdrop) closeBgPanel(); });
-
-// ── APP DATA ──
 function loadData() {
-  try { const r = localStorage.getItem('newtab_apps'); if (r) return JSON.parse(r); } catch(e) {}
+  try { const r=localStorage.getItem('newtab_apps'); if(r) return JSON.parse(r); } catch(e) {}
   return JSON.parse(JSON.stringify(DEFAULTS));
 }
 function saveData(d) { try { localStorage.setItem('newtab_apps', JSON.stringify(d)); } catch(e) {} }
-function getFavicon(url, customIcon) {
-  if (customIcon && customIcon.trim()) return customIcon.trim();
+function getFavicon(url, icon) {
+  if (icon && icon.trim()) return icon.trim();
   try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=64`; } catch(e) { return ''; }
 }
 function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
@@ -736,14 +880,14 @@ function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot
 let appData = loadData();
 let isEditMode = false;
 
-function renderSection(sectionEl, items, key) {
-  sectionEl.innerHTML = '';
+function renderSection(el, items, key) {
+  el.innerHTML = '';
   items.forEach((item, idx) => {
     const wrap = document.createElement('div');
     wrap.className = 'app-item-wrap';
     wrap.innerHTML = `
       <a class="applink" href="${escHtml(item.url)}" target="${item.topTarget?'_top':'_self'}">
-        <div class="appico"><img src="${escHtml(getFavicon(item.url,item.icon))}" alt="" onerror="this.style.opacity='0'"></div>
+        <div class="appico"><img src="${escHtml(getFavicon(item.url,item.icon))}" alt="" loading="lazy" onerror="this.style.opacity='0'"></div>
         ${escHtml(item.name)}
       </a>
       <button class="app-del-corner" title="Remove">
@@ -756,13 +900,13 @@ function renderSection(sectionEl, items, key) {
       e.stopPropagation();
       appData[key].splice(idx,1); saveData(appData); renderAll();
     });
-    sectionEl.appendChild(wrap);
+    el.appendChild(wrap);
   });
   const addWrap = document.createElement('div');
-  addWrap.className = 'app-item-wrap'; addWrap.style.display = 'contents';
+  addWrap.style.display = 'contents';
   addWrap.innerHTML = `<button class="add-app-btn" data-section="${key}"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Add</button>`;
-  sectionEl.appendChild(addWrap);
-  sectionEl.querySelector('.add-app-btn').addEventListener('click', e => { e.stopPropagation(); openModal(key, null); });
+  addWrap.querySelector('.add-app-btn').addEventListener('click', e => { e.stopPropagation(); openModal(key, null); });
+  el.appendChild(addWrap);
 }
 
 function renderAll() {
@@ -777,20 +921,22 @@ document.getElementById('edit-toggle-btn').addEventListener('click', e => {
   renderAll();
 });
 
-// ── MODAL ──
+// ════════════════════════════════════════════════════
+// APP MODAL
+// ════════════════════════════════════════════════════
 let modalSection=null, modalIdx=null;
 function openModal(sec, idx) {
   modalSection=sec; modalIdx=idx;
-  const isEdit = idx!==null;
+  const isEdit=idx!==null;
   document.getElementById('modal-title').textContent = isEdit?'Edit shortcut':'Add shortcut';
   document.getElementById('modal-delete-btn').style.display = isEdit?'block':'none';
   if (isEdit) {
-    const it = appData[sec][idx];
-    document.getElementById('modal-name').value = it.name;
-    document.getElementById('modal-url').value = it.url;
-    document.getElementById('modal-icon').value = it.icon||'';
-    document.getElementById('modal-toptarget').checked = !!it.topTarget;
-    updatePreview(it.name, it.url, it.icon||'');
+    const it=appData[sec][idx];
+    document.getElementById('modal-name').value=it.name;
+    document.getElementById('modal-url').value=it.url;
+    document.getElementById('modal-icon').value=it.icon||'';
+    document.getElementById('modal-toptarget').checked=!!it.topTarget;
+    updatePreview(it.name,it.url,it.icon||'');
   } else {
     ['modal-name','modal-url','modal-icon'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('modal-toptarget').checked=false;
@@ -798,25 +944,27 @@ function openModal(sec, idx) {
   }
   document.getElementById('modal-backdrop').classList.add('open');
 }
-function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); modalSection=null; modalIdx=null; }
+function closeModal() { document.getElementById('modal-backdrop').classList.remove('open'); }
 function updatePreview(name,url,icon) {
-  document.getElementById('preview-name').textContent = name||'New shortcut';
-  const img = document.getElementById('preview-img');
+  document.getElementById('preview-name').textContent=name||'New shortcut';
+  const img=document.getElementById('preview-img');
   img.src=getFavicon(url,icon); img.style.opacity='1';
   img.onerror=()=>{img.style.opacity='0';};
 }
-['modal-name','modal-url','modal-icon'].forEach(id=>{
-  document.getElementById(id).addEventListener('input',()=>{
-    updatePreview(document.getElementById('modal-name').value,document.getElementById('modal-url').value,document.getElementById('modal-icon').value);
-  });
+['modal-name','modal-url','modal-icon'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => updatePreview(
+    document.getElementById('modal-name').value,
+    document.getElementById('modal-url').value,
+    document.getElementById('modal-icon').value
+  ));
 });
 document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
-document.getElementById('modal-backdrop').addEventListener('click', e=>{if(e.target===document.getElementById('modal-backdrop'))closeModal();});
-document.getElementById('modal-delete-btn').addEventListener('click', ()=>{
+document.getElementById('modal-backdrop').addEventListener('click', e => { if(e.target===document.getElementById('modal-backdrop')) closeModal(); });
+document.getElementById('modal-delete-btn').addEventListener('click', () => {
   if(modalSection!==null&&modalIdx!==null){appData[modalSection].splice(modalIdx,1);saveData(appData);renderAll();}
   closeModal();
 });
-document.getElementById('modal-save-btn').addEventListener('click', ()=>{
+document.getElementById('modal-save-btn').addEventListener('click', () => {
   let url=document.getElementById('modal-url').value.trim();
   const name=document.getElementById('modal-name').value.trim()||url;
   const icon=document.getElementById('modal-icon').value.trim();
@@ -829,21 +977,43 @@ document.getElementById('modal-save-btn').addEventListener('click', ()=>{
   saveData(appData);renderAll();closeModal();
 });
 
-// ── SEARCH ──
+// ════════════════════════════════════════════════════
+// SEARCH
+// ════════════════════════════════════════════════════
 const qInput=document.getElementById('q');
 function doSearch(){
-  const v=qInput.value.trim(); if(!v)return;
+  const v=qInput.value.trim(); if(!v) return;
   if(/^https?:\/\//i.test(v)){window.location.href=v;return;}
   if(/^www\./i.test(v)||(/\.[a-z]{2,}$/i.test(v)&&!v.includes(' '))){window.location.href='https://'+v;return;}
   window.location.href='https://www.google.com/search?q='+encodeURIComponent(v)+'&igu=1';
 }
-document.getElementById('s-submit').addEventListener('click',doSearch);
-qInput.addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+document.getElementById('s-submit').addEventListener('click', doSearch);
+qInput.addEventListener('keydown', e=>{if(e.key==='Enter')doSearch();});
 
-// ── INIT ──
-applyDailyRefresh();
-applyBackground();
-renderAll();
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+async function init() {
+  // Fade-in — apply immediately before anything renders
+  if (cfg.fadeIn) {
+    document.body.classList.add('fadein');
+    requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('fadein-go')));
+  }
+
+  applyBackground();
+  renderAll();
+
+  // Fetch backgrounds then build grid + tabs
+  await fetchBackgrounds();
+  applyDailyRefresh();   // may advance index after fetch
+  applyBackground();     // re-apply in case daily refresh changed it
+
+  buildCatTabs();
+  // If panel is open (won't be on first load, but good practice)
+  if (panelOpen) syncPanelUI();
+}
+
+init();
 </script>
 </body>
 </html>
