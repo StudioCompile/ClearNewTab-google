@@ -64,7 +64,10 @@ body.no-bg:not(.dark) .tnav-icon-label { color:rgba(0,0,0,0.54); }
 body.no-bg:not(.dark) .tnav-icon-label:hover { background:rgba(0,0,0,0.06); }
 #apps-toggle:checked ~ #topnav .tnav-icon-label { background:rgba(255,255,255,0.2); }
 
-.tnav-pfp { width:32px; height:32px; border-radius:50%; overflow:hidden; margin-left:4px; cursor:pointer; display:block; }
+.tnav-pfp {
+  width:32px; height:32px; border-radius:50%; overflow:hidden; margin-left:4px; cursor:pointer;
+  display:block; border:none; padding:0; background:none; flex-shrink:0;
+}
 .tnav-pfp img { width:100%; height:100%; object-fit:cover; display:block; }
 
 /* ── OVERLAY ── */
@@ -129,10 +132,10 @@ body.dark .appdrop-divider { background:#3c4043; }
   font-family:'Google Sans',Roboto,arial,sans-serif;
 }
 
-.app-item-wrap { position:relative; border-radius:14px; }
+.app-item-wrap { position:relative; border-radius:16px; }
 .applink {
   display:flex; flex-direction:column; align-items:center;
-  gap:5px; padding:8px 4px 10px; border-radius:14px; text-decoration:none; color:#3c4043;
+  gap:6px; padding:10px 6px 12px; border-radius:16px; text-decoration:none; color:#3c4043;
   font-size:11px; font-family:'Google Sans','Google Sans Text',Roboto,arial,sans-serif; font-weight:400;
   transition:background 0.12s; width:100%; text-align:center;
 }
@@ -141,12 +144,11 @@ body.dark .applink { color:#e8eaed; }
 body.dark .applink:hover { background:#3c4043; }
 
 .appico {
-  width:54px; height:54px; border-radius:50%; background:#f8f9fa;
-  border:1px solid #e8eaed; display:flex; align-items:center; justify-content:center;
-  overflow:hidden; flex-shrink:0;
+  width:54px; height:54px; background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  overflow:visible; flex-shrink:0;
 }
-body.dark .appico { background:#3c4043; border-color:#5f6368; }
-.appico img { width:30px; height:30px; object-fit:contain; border-radius:3px; }
+.appico img { width:42px; height:42px; object-fit:contain; border-radius:6px; }
 
 .app-del-corner {
   display:none; position:absolute; top:2px; right:2px;
@@ -161,7 +163,7 @@ body.dark .app-del-corner { border-color:#2d2e31; }
 
 .add-app-btn {
   display:none; align-items:center; justify-content:center; gap:4px; padding:8px 4px 10px;
-  border-radius:14px; border:1.5px dashed #dadce0; background:none; cursor:pointer; color:#9aa0a6;
+  border-radius:16px; border:1.5px dashed #dadce0; background:none; cursor:pointer; color:#9aa0a6;
   font-size:11px; font-family:'Google Sans',Roboto,arial,sans-serif; flex-direction:column; width:100%;
   transition:background 0.12s, border-color 0.12s;
 }
@@ -180,7 +182,7 @@ body.dark .appdrop-more { color:#8ab4f8; }
 
 /* ── APP EDIT MODAL ── */
 .modal-backdrop {
-  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:500;
+  display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:650;
   align-items:center; justify-content:center;
 }
 body.dark .modal-backdrop { background:rgba(0,0,0,0.6); }
@@ -238,10 +240,19 @@ body.dark .modal-toggle-label { color:#e8eaed; }
   border-radius:12px; background:#f8f9fa; margin-bottom:18px;
 }
 body.dark .modal-preview { background:#3c4043; }
-.modal-preview .appico { width:36px; height:36px; flex-shrink:0; }
+.modal-preview .appico { width:36px; height:36px; flex-shrink:0; border-radius:10px; background:#f8f9fa; border:1px solid #e8eaed; }
 .modal-preview .appico img { width:20px; height:20px; }
+body.dark .modal-preview .appico { background:#3c4043; border-color:#5f6368; }
 .modal-preview-name { font-size:13px; color:#202124; font-family:'Google Sans',Roboto,arial,sans-serif; }
 body.dark .modal-preview-name { color:#e8eaed; }
+
+.modal-preview .pfp-avatar { width:36px; height:36px; flex-shrink:0; border-radius:50%; background:#e8eaed; overflow:hidden; display:flex; align-items:center; justify-content:center; }
+.modal-preview .pfp-avatar img { width:100%; height:100%; object-fit:cover; }
+body.dark .modal-preview .pfp-avatar { background:#4a4e52; }
+
+.modal-hint { font-size:11.5px; color:#9aa0a6; margin:-8px 0 16px; font-family:'Google Sans Text',arial,sans-serif; line-height:1.4; }
+body.dark .modal-hint { color:#80868b; }
+.pfp-upload-row { margin-bottom:18px; }
 
 .modal-btns { display:flex; justify-content:flex-end; gap:10px; }
 .modal-btn {
@@ -260,6 +271,68 @@ body.dark .modal-btn.save:hover { background:#93bbf9; }
 body.dark .modal-btn.delete { background:#4a1818; color:#f28b82; }
 .modal-btn.delete:hover { background:#f5c6c2; }
 body.dark .modal-btn.delete:hover { background:#5c2020; }
+
+/* ── ACCOUNT SWITCHER PANEL ── */
+.pfp-overlay { display:none; position:fixed; inset:0; z-index:590; background:transparent; }
+.pfp-overlay.open { display:block; }
+
+.pfp-panel {
+  display:none; position:fixed; top:56px; right:10px; width:320px;
+  background:#282a2d; color:#e8eaed; border-radius:22px; z-index:600;
+  box-shadow:0 4px 12px rgba(0,0,0,.35),0 12px 32px rgba(0,0,0,.4);
+  font-family:'Google Sans','Google Sans Text',Roboto,arial,sans-serif;
+  animation:dropIn 0.18s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.pfp-panel.open { display:block; }
+
+.pfp-panel-header {
+  display:flex; align-items:center; justify-content:center; position:relative;
+  padding:16px 40px; text-align:center;
+}
+.pfp-panel-email { font-size:13px; font-weight:500; color:#e8eaed; word-break:break-all; }
+.pfp-panel-close {
+  position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%;
+  border:none; background:transparent; color:#9aa0a6; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; transition:background 0.12s;
+}
+.pfp-panel-close:hover { background:rgba(255,255,255,0.1); color:#e8eaed; }
+
+.pfp-panel-avatar-wrap { display:flex; justify-content:center; padding:6px 0 14px; }
+.pfp-panel-avatar {
+  width:76px; height:76px; border-radius:50%; overflow:hidden; background:#3c4043;
+}
+.pfp-panel-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+
+.pfp-panel-greeting {
+  text-align:center; font-size:20px; font-weight:400; color:#e8eaed; padding:0 20px 16px;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
+}
+
+.pfp-panel-manage-btn {
+  display:block; margin:0 auto 18px; width:calc(100% - 40px); text-align:center;
+  padding:9px 0; border-radius:20px; border:1px solid #5f6368; color:#8ab4f8;
+  font-size:13px; font-weight:500; text-decoration:none;
+  font-family:'Google Sans',Roboto,arial,sans-serif; transition:background 0.12s;
+}
+.pfp-panel-manage-btn:hover { background:rgba(138,180,248,0.08); }
+
+.pfp-panel-divider { height:1px; background:rgba(255,255,255,0.08); margin:0 0 6px; }
+
+.pfp-panel-row {
+  display:flex; align-items:center; gap:14px; width:100%; padding:12px 20px;
+  border:none; background:transparent; color:#e8eaed; font-size:13.5px; text-align:left;
+  cursor:pointer; font-family:'Google Sans Text','Google Sans',Roboto,arial,sans-serif; transition:background 0.12s;
+}
+.pfp-panel-row:hover { background:rgba(255,255,255,0.06); }
+.pfp-row-icon { width:20px; height:20px; flex-shrink:0; display:flex; align-items:center; justify-content:center; color:#9aa0a6; }
+
+.pfp-panel-footer {
+  padding:14px 20px 18px; text-align:center; font-size:11px; color:#9aa0a6;
+  font-family:'Google Sans',Roboto,arial,sans-serif;
+}
+.pfp-panel-footer a { color:#9aa0a6; text-decoration:none; }
+.pfp-panel-footer a:hover { text-decoration:underline; }
 
 /* ── MAIN ── */
 #main { flex:1; display:flex; flex-direction:column; align-items:center; padding-top:14vh; position:relative; z-index:1; }
@@ -484,10 +557,37 @@ body.panel-open #customize-panel { right:0; }
       <rect x="17" y="17" width="4" height="4" rx="0.5"/>
     </svg>
   </label>
-  <a class="tnav-pfp" href="https://myaccount.google.com/" target="_self">
-    <img src="https://lh3.googleusercontent.com/-hCKN--em-Qw/AAAAAAAAAAI/AAAAAAAAAAA/ALKGfkmP4VPG-a-cGDymnXMvOqRKZip8IA/photo.jpg?sz=46" alt="Profile">
-  </a>
+  <button class="tnav-pfp" id="pfp-btn" type="button" title="Account" aria-label="Account">
+    <img id="pfp-img" src="" alt="Profile">
+  </button>
 </nav>
+
+<div class="pfp-overlay" id="pfp-overlay"></div>
+<div class="pfp-panel" id="pfp-panel">
+  <div class="pfp-panel-header">
+    <span class="pfp-panel-email" id="pfp-panel-email">No email set</span>
+    <button class="pfp-panel-close" id="pfp-panel-close" aria-label="Close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    </button>
+  </div>
+  <div class="pfp-panel-avatar-wrap">
+    <div class="pfp-panel-avatar"><img id="pfp-panel-avatar-img" src="" alt=""></div>
+  </div>
+  <div class="pfp-panel-greeting" id="pfp-panel-greeting">Hi there!</div>
+  <a class="pfp-panel-manage-btn" href="https://myaccount.google.com/" target="_blank" rel="noopener">Manage your Google Account</a>
+  <div class="pfp-panel-divider"></div>
+  <button class="pfp-panel-row" id="pfp-panel-change-row">
+    <span class="pfp-row-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></span>
+    Change email
+  </button>
+  <button class="pfp-panel-row" id="pfp-panel-signout-row">
+    <span class="pfp-row-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10.09 15.59L11.5 17l5-5-5-5-1.41 1.41L12.67 11H3v2h9.67zM19 3H5c-1.11 0-2 .9-2 2v4h2V5h14v14H5v-4H3v4c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/></svg></span>
+    Sign out of all accounts
+  </button>
+  <div class="pfp-panel-footer">
+    <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy Policy</a> · <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms of Service</a>
+  </div>
+</div>
 
 <label class="apps-overlay" for="apps-toggle"></label>
 
@@ -511,7 +611,7 @@ body.panel-open #customize-panel { right:0; }
   <div class="modal">
     <div class="modal-title" id="modal-title">Add shortcut</div>
     <div class="modal-preview">
-      <div class="appico"><img id="preview-img" src="" alt=""></div>
+      <div class="appico" style="border-radius:10px;"><img id="preview-img" src="" alt=""></div>
       <span class="modal-preview-name" id="preview-name">New shortcut</span>
     </div>
     <div class="modal-field"><label>Name</label><input type="text" id="modal-name" placeholder="e.g. Gmail" autocomplete="off"></div>
@@ -528,6 +628,31 @@ body.panel-open #customize-panel { right:0; }
       <button class="modal-btn delete" id="modal-delete-btn" style="display:none">Delete</button>
       <button class="modal-btn cancel" id="modal-cancel-btn">Cancel</button>
       <button class="modal-btn save" id="modal-save-btn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PICTURE MODAL -->
+<div class="modal-backdrop" id="pfp-modal-backdrop">
+  <div class="modal">
+    <div class="modal-title" id="pfp-modal-title">Set profile picture</div>
+    <div class="modal-preview">
+      <div class="pfp-avatar"><img id="pfp-preview-img" src="" alt=""></div>
+      <span class="modal-preview-name" id="pfp-preview-name">No email set</span>
+    </div>
+    <div class="modal-field">
+      <label>Email</label>
+      <input type="text" id="pfp-email-input" placeholder="you@example.com" autocomplete="off">
+    </div>
+    <div class="modal-hint">Used for the "Hi, Name!" greeting. Gravatar can only show a picture for emails that are actually registered on gravatar.com — most Gmail addresses aren't — so upload your real photo below for your actual picture.</div>
+    <div class="pfp-upload-row">
+      <button class="modal-btn cancel" id="pfp-upload-btn" type="button" style="width:100%;">Upload your photo</button>
+      <input type="file" id="pfp-upload-input" accept="image/*" style="display:none">
+    </div>
+    <div class="modal-btns">
+      <button class="modal-btn delete" id="pfp-remove-btn">Remove</button>
+      <button class="modal-btn cancel" id="pfp-cancel-btn">Cancel</button>
+      <button class="modal-btn save" id="pfp-save-btn">Save</button>
     </div>
   </div>
 </div>
@@ -907,6 +1032,140 @@ document.getElementById('bg-file-input').addEventListener('change', function() {
 });
 
 // ════════════════════════════════════════════════════
+// PROFILE PICTURE
+// ════════════════════════════════════════════════════
+const DEFAULT_PFP = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" fill="#c8c8c8"/><circle cx="16" cy="13" r="6" fill="#fff"/><path d="M4 30c0-7 5.5-11 12-11s12 4 12 11" fill="#fff"/></svg>`
+);
+
+function loadPfpCfg() {
+  try { const r = localStorage.getItem('nt_pfp'); if (r) return JSON.parse(r); } catch(e) {}
+  return { email:'', avatarUrl:'' };
+}
+function savePfpCfg() { try { localStorage.setItem('nt_pfp', JSON.stringify(pfpCfg)); } catch(e) {} }
+function loadPfpPhoto() { try { return localStorage.getItem('nt_pfp_photo')||''; } catch(e) { return ''; } }
+function savePfpPhoto(u) { try { localStorage.setItem('nt_pfp_photo', u); } catch(e) {} }
+
+let pfpCfg = loadPfpCfg();
+pfpCfg.photoUrl = loadPfpPhoto();
+
+// The uploaded photo always wins over a Gravatar lookup, since it's guaranteed
+// to actually be the person's own picture.
+function currentPfpImage() { return pfpCfg.photoUrl || pfpCfg.avatarUrl || ''; }
+
+async function emailToAvatarUrl(email) {
+  const cleaned = email.trim().toLowerCase();
+  if (!cleaned) return '';
+  try {
+    const enc = new TextEncoder().encode(cleaned);
+    const digest = await crypto.subtle.digest('SHA-256', enc);
+    const hash = Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2,'0')).join('');
+    return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=200`;
+  } catch(e) {
+    // Fallback if Web Crypto isn't available in this context
+    return `https://www.gravatar.com/avatar/00000000000000000000000000000000?d=identicon&s=200`;
+  }
+}
+
+function applyPfp() {
+  document.getElementById('pfp-img').src = currentPfpImage() || DEFAULT_PFP;
+  syncPfpPanel();
+}
+
+function greetingNameFromEmail(email) {
+  const local = (email.split('@')[0] || '').trim();
+  const m = local.match(/^[A-Za-z]+/);
+  const raw = m ? m[0] : local;
+  if (!raw) return '';
+  return raw.charAt(0).toUpperCase() + raw.slice(1).toLowerCase();
+}
+
+function syncPfpPanel() {
+  const email = pfpCfg.email || '';
+  document.getElementById('pfp-panel-email').textContent = email || 'No email set';
+  document.getElementById('pfp-panel-avatar-img').src = currentPfpImage() || DEFAULT_PFP;
+  const name = greetingNameFromEmail(email);
+  document.getElementById('pfp-panel-greeting').textContent = name ? `Hi, ${name}!` : 'Hi there!';
+}
+
+function openPfpPanel() {
+  syncPfpPanel();
+  document.getElementById('pfp-panel').classList.add('open');
+  document.getElementById('pfp-overlay').classList.add('open');
+}
+function closePfpPanel() {
+  document.getElementById('pfp-panel').classList.remove('open');
+  document.getElementById('pfp-overlay').classList.remove('open');
+}
+
+function openPfpModal() {
+  closePfpPanel();
+  const input = document.getElementById('pfp-email-input');
+  input.value = pfpCfg.email || '';
+  updatePfpPreview(pfpCfg.email || '', currentPfpImage());
+  document.getElementById('pfp-modal-backdrop').classList.add('open');
+  input.focus();
+}
+function closePfpModal() { document.getElementById('pfp-modal-backdrop').classList.remove('open'); }
+
+function updatePfpPreview(email, imageUrl) {
+  const previewImg = document.getElementById('pfp-preview-img');
+  const previewName = document.getElementById('pfp-preview-name');
+  previewImg.src = imageUrl || DEFAULT_PFP;
+  previewName.textContent = email || 'No email set';
+}
+
+let pfpDebounce = null;
+document.getElementById('pfp-email-input').addEventListener('input', function() {
+  const val = this.value;
+  clearTimeout(pfpDebounce);
+  pfpDebounce = setTimeout(async () => {
+    // An uploaded photo always takes priority in the preview.
+    if (pfpCfg.photoUrl) { updatePfpPreview(val, pfpCfg.photoUrl); return; }
+    if (!val.trim()) { updatePfpPreview(val, ''); return; }
+    const url = await emailToAvatarUrl(val);
+    updatePfpPreview(val, url);
+  }, 250);
+});
+
+document.getElementById('pfp-upload-btn').addEventListener('click', () => {
+  document.getElementById('pfp-upload-input').click();
+});
+document.getElementById('pfp-upload-input').addEventListener('change', function() {
+  const file = this.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    pfpCfg.photoUrl = e.target.result;
+    savePfpPhoto(pfpCfg.photoUrl);
+    updatePfpPreview(document.getElementById('pfp-email-input').value, pfpCfg.photoUrl);
+  };
+  reader.readAsDataURL(file); this.value = '';
+});
+
+document.getElementById('pfp-btn').addEventListener('click', openPfpPanel);
+document.getElementById('pfp-panel-close').addEventListener('click', closePfpPanel);
+document.getElementById('pfp-overlay').addEventListener('click', closePfpPanel);
+document.getElementById('pfp-panel-change-row').addEventListener('click', openPfpModal);
+document.getElementById('pfp-panel-signout-row').addEventListener('click', () => {
+  pfpCfg = { email:'', avatarUrl:'', photoUrl:'' }; savePfpPhoto(''); savePfpCfg(); applyPfp(); closePfpPanel();
+});
+document.getElementById('pfp-cancel-btn').addEventListener('click', closePfpModal);
+document.getElementById('pfp-modal-backdrop').addEventListener('click', e => {
+  if (e.target === document.getElementById('pfp-modal-backdrop')) closePfpModal();
+});
+document.getElementById('pfp-remove-btn').addEventListener('click', () => {
+  pfpCfg = { email:'', avatarUrl:'', photoUrl:'' }; savePfpPhoto(''); savePfpCfg(); applyPfp(); closePfpModal();
+});
+document.getElementById('pfp-save-btn').addEventListener('click', async () => {
+  const email = document.getElementById('pfp-email-input').value.trim();
+  const photoUrl = pfpCfg.photoUrl || '';
+  if (!email && !photoUrl) { pfpCfg = { email:'', avatarUrl:'', photoUrl:'' }; savePfpPhoto(''); savePfpCfg(); applyPfp(); closePfpModal(); return; }
+  const avatarUrl = email ? await emailToAvatarUrl(email) : '';
+  pfpCfg = { email, avatarUrl, photoUrl };
+  savePfpCfg(); applyPfp(); closePfpModal();
+});
+
+// ════════════════════════════════════════════════════
 // APP DATA
 // ════════════════════════════════════════════════════
 const DEFAULTS = {
@@ -1064,6 +1323,7 @@ async function init() {
   }
 
   applyBackground();
+  applyPfp();
   renderAll();
 
   await fetchBackgrounds();
